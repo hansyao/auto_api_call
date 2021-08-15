@@ -13,7 +13,7 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
     - name: 调用API
       env:
-        MS_TOKEN1: ${{ secrets.MS_TOKEN1 }}
+        CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
         CLIENT_SECRET1: ${{ secrets.CLIENT_SECRET1 }}
         REFESH_TOKEN1: ${{ secrets.REFESH_TOKEN1 }}
         # CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
