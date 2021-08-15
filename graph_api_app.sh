@@ -162,6 +162,7 @@ function main() {
 	# account_env
 	local CLIENT_LIST=$(get_client_info)
 	echo -e "测试令牌"
+	get_client_info
 	echo -e "${CLIENT_LIST}"
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
