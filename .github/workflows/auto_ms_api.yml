@@ -24,6 +24,8 @@ jobs:
         ./graph_api_app.sh
     - name: 提交更改
       run: |
+        git config --global user.email "hansyow@gmail.com"
+        git config --global user.name "hansyao"      
         git pull
         git add .github/workflows/auto_ms_api.yml
         git commit -m "schedule updated"
