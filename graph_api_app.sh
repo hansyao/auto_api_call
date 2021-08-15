@@ -8,7 +8,7 @@ function account_env() {
 	export CLIENT_ID1=
 	export CLIENT_SECRET1=
 	export REFESH_TOKEN1=
-	
+
 	export CLIENT_ID2=
 	export CLIENT_SECRET2=
 	export REFESH_TOKEN2=
@@ -159,7 +159,7 @@ function update_cron() {
 
 function main() {
 	RESULTS_FILE="$(mktemp)"
-	account_env
+	# account_env
 	local CLIENT_LIST=$(get_client_info)
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
