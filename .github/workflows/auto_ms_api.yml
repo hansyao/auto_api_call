@@ -14,12 +14,12 @@ jobs:
         MS_TOKEN1: ${{ secrets.MS_TOKEN1 }}
         CLIENT_SECRET1: ${{ secrets.CLIENT_SECRET1 }}
         REFESH_TOKEN1: ${{ secrets.REFESH_TOKEN1 }}
-        CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
-        CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
-        REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
-        CLIENT_ID3: ${{ secrets.CLIENT_ID3 }}
-        CLIENT_SECRET3: ${{ secrets.CLIENT_SECRET3 }}
-        REFESH_TOKEN3: ${{ secrets.REFESH_TOKEN3 }}
+        # CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
+        # CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
+        # REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
+        # CLIENT_ID3: ${{ secrets.CLIENT_ID3 }}
+        # CLIENT_SECRET3: ${{ secrets.CLIENT_SECRET3 }}
+        # REFESH_TOKEN3: ${{ secrets.REFESH_TOKEN3 }}
       run: |
         ./graph_api_app.sh
     - name: 提交更改
