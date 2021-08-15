@@ -9,6 +9,8 @@ jobs:
     steps:
     - name: 迁出代码
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_TOKEN }}
     - name: 调用API
       env:
         MS_TOKEN1: ${{ secrets.MS_TOKEN1 }}
