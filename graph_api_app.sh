@@ -162,20 +162,23 @@ function main() {
 	# account_env
 	local CLIENT_LIST=$(get_client_info)
 	echo -e "测试令牌"
-	get_client_info
 	echo -e "${CLIENT_LIST}"
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
 		exit 0
 	fi
-	echo -e "${CLIENT_LIST}" | while read ACCOUNT && [[ -n "${ACCOUNT}" ]]
-	do
+	# echo -e "${CLIENT_LIST}" | while read ACCOUNT && [[ -n "${ACCOUNT}" ]]
+	# do
 		local START_TIME=$(date +%s)
 
 		local API_LIST=$(get_api_random)
-		local CLIENT_ID=$(echo -e "${ACCOUNT}" | awk '{print $1}')
-		local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $2}')
-		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $3}')
+		# local CLIENT_ID=$(echo -e "${ACCOUNT}" | awk '{print $1}')
+		# local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $2}')
+		# local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $3}')
+
+		CLIENT_ID=${CLIENT_ID1}
+		CLIENT_SECRET=${CLIENT_SECRET2}
+		REFESH_TOKEN=${REFESH_TOKEN1}
 
 		echo -e "CLIENT_ID ${CLIENT_ID} ----开始调用----"
 		echo -e "======================================================================="
@@ -195,7 +198,7 @@ function main() {
 
 		echo -e "CLIENT_ID ${CLIENT_ID} 本轮调用API:${API_COUNT}个, 耗时${DURATION}秒 \
 	(合计调用:${COUNT}个次; 成功:${SUCCESS_COUNT}次; 失败:${FAILED_COUNT}次)\\n"
-	done
+	# done
 
 	local UPCOMMING_SCHEDULED=$(($(date +%s) + ($RANDOM % 3600 + 600)))
 	local H=$[$(date -d @$[UPCOMMING_SCHEDULED] +%k)]
