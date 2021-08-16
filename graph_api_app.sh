@@ -236,7 +236,7 @@ function main() {
 	(合计调用:${COUNT}个次; 成功:${SUCCESS_COUNT}次; 失败:${FAILED_COUNT}次)\\n"
 	done
 
-	local UPCOMMING_SCHEDULED=$(($(date +%s) + ($RANDOM % 3600 + 600)))
+	local UPCOMMING_SCHEDULED=$(( $(date +%s) + $RANDOM % 3600 + 600 ))
 	local H=$[$(date -d @$[UPCOMMING_SCHEDULED] +%k)]
 	local M=$[$(date -d @$[UPCOMMING_SCHEDULED] +%M)]
 	update_cron $H $M
