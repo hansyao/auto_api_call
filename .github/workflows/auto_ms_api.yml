@@ -2,7 +2,11 @@ name: MS OFFICE 365 E5自动续期
 on: 
   workflow_dispatch:
   schedule:
+<<<<<<< Updated upstream
   - cron: '57 6 * * *'
+=======
+  - cron: '52 5 * * *'
+>>>>>>> Stashed changes
 jobs: 
   deploy:
     runs-on: ubuntu-latest
@@ -36,4 +40,7 @@ jobs:
         git pull
         git add .github/workflows/auto_ms_api.yml
         git commit -m "schedule updated"
-        git push -u origin master
+    - name: 推送更改
+      uses:  ad-m/github-push-action@master
+      with:
+         branch: master
