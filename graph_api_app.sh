@@ -25,10 +25,10 @@ function get_client_info() {
 	local CLIENT_SECRET="$(mktemp)"
 	local REFESH_TOKEN="$(mktemp)"
 
-	env | grep 'CLIENT_ID' | cut -d "=" -f1 >${CLIENT_NAME}
-	env | grep 'CLIENT_ID' | cut -d "=" -f2 >${CLIENT_ID}
-	env | grep 'CLIENT_SECRET' | cut -d "=" -f2 >${CLIENT_SECRET}
-	env | grep 'REFESH_TOKEN' | cut -d "=" -f2 >${REFESH_TOKEN}
+	env | grep 'CLIENT_ID' | sort | uniq | cut -d "=" -f1 >${CLIENT_NAME}
+	env | grep 'CLIENT_ID' | sort | uniq | cut -d "=" -f2 >${CLIENT_ID}
+	env | grep 'CLIENT_SECRET' sort | uniq | cut -d "=" -f2 >${CLIENT_SECRET}
+	env | grep 'REFESH_TOKEN' |sort | uniq | cut -d "=" -f2 >${REFESH_TOKEN}
 
 	paste "${CLIENT_NAME}" "${CLIENT_ID}"  "${CLIENT_SECRET}" "${REFESH_TOKEN}" | grep -v '^$'
 
@@ -108,7 +108,7 @@ function api_call_batch() {
 
 	if [[ -z ${ACCESS_TOKEN} || ${ACCESS_TOKEN} == 'null' ]]; then
 		echo -e "获得令牌失败，结束任务!"
-		exit 0
+		exit
 	fi
 
 	# 线程数透传
