@@ -106,7 +106,7 @@ function api_call_batch() {
 	local ACCESS_TOKEN=$(update_access_token \
 		"${CLIENT_ID}" "${CLIENT_SECRET}" "${REFESH_TOKEN}")
 
-	if [[ -z ${ACCESS_TOKEN} ]]; then
+	if [[ -z ${ACCESS_TOKEN} || ${ACCESS_TOKEN} == 'null' ]]; then
 		echo -e "获得令牌失败，结束任务!"
 		exit 0
 	fi
