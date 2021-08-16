@@ -19,9 +19,9 @@ jobs:
         CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
         CLIENT_SECRET1: ${{ secrets.CLIENT_SECRET1 }}
         REFESH_TOKEN1: ${{ secrets.REFESH_TOKEN1 }}
-        # CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
-        # CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
-        # REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
+        CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
+        CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
+        REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
         # CLIENT_ID3: ${{ secrets.CLIENT_ID3 }}
         # CLIENT_SECRET3: ${{ secrets.CLIENT_SECRET3 }}
         # REFESH_TOKEN3: ${{ secrets.REFESH_TOKEN3 }}
