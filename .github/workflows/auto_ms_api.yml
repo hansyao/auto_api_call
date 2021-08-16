@@ -13,6 +13,7 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
     - name: 设置时区
       run: |
+        sudo apt install ntpdate
         sudo timedatectl set-timezone 'UTC'
         sudo ntpdate
     - name: 调用API
