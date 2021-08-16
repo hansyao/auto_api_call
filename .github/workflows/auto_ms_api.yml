@@ -13,9 +13,9 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
     - name: 设置时区
       run: |
-        sudo apt install ntpdate
+        # sudo apt install ntpdate
+        # sudo ntpdate time.nist.gov
         sudo timedatectl set-timezone 'UTC'
-        sudo ntpdate time.nist.gov
     - name: 调用API
       env:
         CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
