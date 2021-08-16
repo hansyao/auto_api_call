@@ -20,16 +20,19 @@ function account_env() {
 
 function get_client_info() {
 
+	local CLIENT_NAME="$(mktemp)"
 	local CLIENT_ID="$(mktemp)"
 	local CLIENT_SECRET="$(mktemp)"
 	local REFESH_TOKEN="$(mktemp)"
 
+	env | grep 'CLIENT_ID' | cut -d "=" -f1 >${CLIENT_NAME}
 	env | grep 'CLIENT_ID' | cut -d "=" -f2 >${CLIENT_ID}
 	env | grep 'CLIENT_SECRET' | cut -d "=" -f2 >${CLIENT_SECRET}
 	env | grep 'REFESH_TOKEN' | cut -d "=" -f2 >${REFESH_TOKEN}
 
-	paste "${CLIENT_ID}"  "${CLIENT_SECRET}" "${REFESH_TOKEN}" | grep -v '^$'
+	paste "${CLIENT_NAME}" "${CLIENT_ID}"  "${CLIENT_SECRET}" "${REFESH_TOKEN}" | grep -v '^$'
 
+	rm -f ${CLIENT_NAME}
 	rm -f ${CLIENT_ID}
 	rm -f ${CLIENT_SECRET}
 	rm -f ${REFESH_TOKEN}
@@ -100,9 +103,10 @@ function api_call() {
 
 function api_call_batch() {
 	local API_LIST=$1
-	local CLIENT_ID=$2
-	local CLIENT_SECRET=$3
-	local REFESH_TOKEN=$4
+	local CLIENT_NAME=$2
+	local CLIENT_ID=$3
+	local CLIENT_SECRET=$4
+	local REFESH_TOKEN=$5
 
 	local ACCESS_TOKEN=$(update_access_token \
 		"${CLIENT_ID}" "${CLIENT_SECRET}" "${REFESH_TOKEN}")
@@ -125,7 +129,7 @@ function api_call_batch() {
 	
 	multi_process_kill  "$(basename $0)"
 
-	echo -e "\\nCLIENT_ID ${CLIENT_ID} 本轮API调用完成"
+	echo -e "\\n${CLIENT_NAME} CLIENT_ID ${CLIENT_ID} 本轮API调用完成"
 
 	exec 3<&-
 	exec 3>&-
@@ -172,13 +176,14 @@ function main() {
 		local START_TIME=$(date +%s)
 
 		local API_LIST=$(get_api_random)
-		local CLIENT_ID=$(echo -e "${ACCOUNT}" | awk '{print $1}')
-		local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $2}')
-		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $3}')
+		local CLIENT_NAME=$(echo -e "${ACCOUNT}" | awk '{print $1}')
+		local CLIENT_ID=$(echo -e "${ACCOUNT}" | awk '{print $2}')
+		local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $3}')
+		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $4}')
 
 		echo -e "CLIENT_ID ${CLIENT_ID} ----开始调用----"
 		echo -e "======================================================================="
-		api_call_batch "${API_LIST}" "${CLIENT_ID}" \
+		api_call_batch "${API_LIST}" "${CLIENT_NAME}" "${CLIENT_ID}" \
 			"${CLIENT_SECRET}" "${REFESH_TOKEN}"
 		local API_COUNT=$(echo -e "${API_LIST}" | sort | uniq | wc -l)
 		local COUNT=$(echo -e "${API_LIST}" | wc -l)
