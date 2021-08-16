@@ -78,7 +78,7 @@ function multi_process_kill() {
 	while :
 	do
 		local THREADS=$(ps -ef | grep ${PROCESS_NAME} | grep -v grep | wc -l)
-		if [[ $[THREADS] -le 2 ]]; then break; fi
+		if [[ $[THREADS] -le 1 ]]; then break; fi
 		if [[ $[THREADS] -le 6 ]]; then
 			if [[ $[i] -le 5 ]]; then
 				sleep 1
