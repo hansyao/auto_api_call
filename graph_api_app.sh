@@ -61,7 +61,6 @@ function update_access_token() {
 	local CLIENT_ID=$1
 	local CLIENT_SECRET=$2
 	local REFESH_TOKEN=$3
-	local TOKEN="$(mktemp)"
 
 	local REFESH_TOKEN="${REFESH_TOKEN}"	
 	local GRANT_TYPE='refresh_token'
@@ -73,10 +72,7 @@ function update_access_token() {
 		-d "client_id=${CLIENT_ID}" \
 		-d "client_secret=${CLIENT_SECRET}" \
 		-d "redirect_uri=${REDIRECT_URI}" \
-		${TOKEN_URL} | jq -r >  ${TOKEN}
-	
-	cat ${TOKEN} | jq -r '.access_token'
-	rm -f ${TOKEN}
+		${TOKEN_URL} | jq -r '.access_token'
 }
 
 function api_call() {
