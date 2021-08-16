@@ -92,13 +92,12 @@ function api_call() {
 
 	if [[ $[STATUS] -eq 200 ]]; then
 		local RE=$(echo -e "API调用成功：	${API}")
-		echo -e "${RE}"
-		echo -e "${RE}" >>${RESULTS_FILE}
 	else
 		local RE=$(echo -e "API调用失败:	${API}")
-		echo -e "${RE}"
-		echo -e "${RE}" >>${RESULTS_FILE}
 	fi
+
+	echo -e "${RE}"
+	echo -e "${RE}" >>${RESULTS_FILE}	
 }
 
 function api_call_batch() {
@@ -165,7 +164,7 @@ function main() {
 	RESULTS_FILE="$(mktemp)"
 	# account_env
 	local CLIENT_LIST=$(get_client_info)
-	echo -e "测试令牌"
+	echo -e "测试令牌\\n"
 	echo -e "${CLIENT_LIST}"
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
