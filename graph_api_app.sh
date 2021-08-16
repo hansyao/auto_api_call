@@ -5,17 +5,17 @@ REDIRECT_URI='http://localhost:53682/'
 THREADNUMBER=10
 
 function account_env() {
-	export CLIENT_ID1=
-	export CLIENT_SECRET1=
-	export REFESH_TOKEN1=
+	export CLIENT_ID1=''
+	export CLIENT_SECRET1=''
+	export REFESH_TOKEN1=''
 
-	export CLIENT_ID2=
-	export CLIENT_SECRET2=
-	export REFESH_TOKEN2=
+	export CLIENT_ID2=''
+	export CLIENT_SECRET2=''
+	export REFESH_TOKEN2=''
 
-	export CLIENT_ID3=
-	export CLIENT_SECRET3=
-	export REFESH_TOKEN3=
+	export CLIENT_ID3=''
+	export CLIENT_SECRET3=''
+	export REFESH_TOKEN3=''
 }
 
 function get_client_info() {
@@ -160,8 +160,8 @@ function main() {
 	RESULTS_FILE="$(mktemp)"
 	# account_env
 	local CLIENT_LIST=$(get_client_info)
-	echo -e "测试令牌\\n"
-	echo -e "${CLIENT_LIST}"
+	echo -e "测试令牌"
+	echo -e "${CLIENT_LIST}\\n"
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
 		exit 0
