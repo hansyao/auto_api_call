@@ -106,6 +106,11 @@ function api_call_batch() {
 	local ACCESS_TOKEN=$(update_access_token \
 		"${CLIENT_ID}" "${CLIENT_SECRET}" "${REFESH_TOKEN}")
 
+	if [[ -z ${ACCESS_TOKEN} ]]; then
+		echo -e "获得令牌失败，结束任务!"
+		exit 0
+	fi
+
 	# 线程数透传
 	[ -e /tmp/fd1 ] || mkfifo /tmp/fd1
 	exec 3<>/tmp/fd1
@@ -204,6 +209,4 @@ function main() {
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
 
-# account_env
-# get_client_info
 main
