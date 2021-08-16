@@ -3,7 +3,8 @@ on:
   workflow_dispatch:
   schedule:
   - cron: '21 3 * * *'
-jobs:
+    timezone: "Asia/Shanghai"
+jobs: 
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -11,6 +12,8 @@ jobs:
       uses: actions/checkout@v2
       with:
         token: ${{ secrets.GH_TOKEN }}
+    - name: 设置时区
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'        
     - name: 调用API
       env:
         CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
