@@ -7,7 +7,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: 迁入代码
+    - name: 迁出代码
       uses: actions/checkout@v2
       with:
         token: ${{ secrets.GH_TOKEN }}
