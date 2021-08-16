@@ -165,6 +165,8 @@ function main() {
 	RESULTS_FILE="$(mktemp)"
 	# account_env
 	local CLIENT_LIST=$(get_client_info)
+	echo -e "测试令牌"
+	echo -e "${CLIENT_LIST}"
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
 		exit 0
@@ -179,7 +181,7 @@ function main() {
 		local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $3}')
 		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $4}')
 
-		echo -e "CLIENT_ID ${CLIENT_ID} ----开始调用----"
+		echo -e "${CLIENT_NAME} ----开始调用----"
 		echo -e "======================================================================="
 		api_call_batch "${API_LIST}" "${CLIENT_NAME}" "${CLIENT_ID}" \
 			"${CLIENT_SECRET}" "${REFESH_TOKEN}"
