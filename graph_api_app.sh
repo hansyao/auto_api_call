@@ -182,7 +182,6 @@ function main() {
 		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $4}')
 
 		echo -e "${CLIENT_NAME} ----开始调用----"
-		echo -e "======================================================================="
 		api_call_batch "${API_LIST}" "${CLIENT_NAME}" "${CLIENT_ID}" \
 			"${CLIENT_SECRET}" "${REFESH_TOKEN}"
 		local API_COUNT=$(echo -e "${API_LIST}" | sort | uniq | wc -l)
