@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
   schedule:
   - cron: '35 12 * * *'
-    timezone: "Asia/Shanghai"
 jobs: 
   deploy:
     runs-on: ubuntu-latest
@@ -13,7 +12,7 @@ jobs:
       with:
         token: ${{ secrets.GH_TOKEN }}
     - name: 设置时区
-      run: sudo timedatectl set-timezone 'Asia/Shanghai'        
+      run: sudo timedatectl set-timezone 'UTC'        
     - name: 调用API
       env:
         CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
