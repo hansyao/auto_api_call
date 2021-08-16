@@ -129,7 +129,7 @@ function api_call_batch() {
 	
 	multi_process_kill  "$(basename $0)"
 
-	echo -e "\\n${CLIENT_NAME} CLIENT_ID ${CLIENT_ID} 本轮API调用完成"
+	echo -e "\\n${CLIENT_NAME} ${CLIENT_ID} 本轮API调用完成"
 
 	exec 3<&-
 	exec 3>&-
@@ -197,7 +197,7 @@ function main() {
 		local STOP_TIME=$(date +%s)
 		local DURATION=$(($[STOP_TIME] - $[START_TIME]))
 
-		echo -e "CLIENT_ID ${CLIENT_ID} 本轮调用API:${API_COUNT}个, 耗时${DURATION}秒 \
+		echo -e "${CLIENT_NAME} 本轮调用API:${API_COUNT}个, 耗时${DURATION}秒 \
 	(合计调用:${COUNT}个次; 成功:${SUCCESS_COUNT}次; 失败:${FAILED_COUNT}次)\\n"
 	done
 
