@@ -1,6 +1,5 @@
 #!/bin/bash
 
-API_LIST_FILE='api_list.conf'
 REDIRECT_URI='http://localhost:53682/'
 THREADNUMBER=10
 
@@ -16,6 +15,40 @@ function account_env() {
 	export CLIENT_ID3=''
 	export CLIENT_SECRET3=''
 	export REFESH_TOKEN3=''
+}
+
+function api_list() {
+	echo -e '
+
+	https://graph.microsoft.com/v1.0/me/
+	https://graph.microsoft.com/v1.0/users
+	https://graph.microsoft.com/v1.0/me/people
+	https://graph.microsoft.com/v1.0/groups
+	https://graph.microsoft.com/v1.0/me/contacts
+	https://graph.microsoft.com/v1.0/me/drive/root
+	https://graph.microsoft.com/v1.0/me/drive/root/children
+	https://graph.microsoft.com/v1.0/drive/root
+	https://graph.microsoft.com/v1.0/me/drive
+	https://graph.microsoft.com/v1.0/me/drive/recent
+	https://graph.microsoft.com/v1.0/me/drive/sharedWithMe
+	https://graph.microsoft.com/v1.0/me/calendars
+	https://graph.microsoft.com/v1.0/me/events
+	https://graph.microsoft.com/v1.0/sites/root
+	https://graph.microsoft.com/v1.0/sites/root/sites
+	https://graph.microsoft.com/v1.0/sites/root/drives
+	https://graph.microsoft.com/v1.0/sites/root/columns
+	https://graph.microsoft.com/v1.0/me/onenote/notebooks
+	https://graph.microsoft.com/v1.0/me/onenote/sections
+	https://graph.microsoft.com/v1.0/me/onenote/pages
+	https://graph.microsoft.com/v1.0/me/messages
+	https://graph.microsoft.com/v1.0/me/mailFolders
+	https://graph.microsoft.com/v1.0/me/outlook/masterCategories
+	https://graph.microsoft.com/v1.0/me/mailFolders/Inbox/messages/delta
+	https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messageRules
+	https://graph.microsoft.com/v1.0/me/messages\?\$search\=%22importance%3Ahigh%22
+	https://graph.microsoft.com/v1.0/me/messages\?\$search\=hello%20mrhans
+
+	'
 }
 
 function get_client_info() {
@@ -44,8 +77,9 @@ function multi_process_kill() {
 	local i=0
 	while :
 	do
-		# echo -e "正在退出 当前线程数" $(ps -ef | grep $(basename $0) | grep -v "grep" | wc -l)
-		if [[ $(ps -ef | grep ${PROCESS_NAME} | grep -v grep | wc -l) -le 6 ]]; then
+		local THREADS=$(ps -ef | grep ${PROCESS_NAME} | grep -v grep | wc -l)
+		if [[ $[THREADS] -le 2 ]]; then break; fi
+		if [[ $[THREADS] -le 6 ]]; then
 			if [[ $[i] -le 5 ]]; then
 				sleep 1
 				let i++
@@ -107,8 +141,8 @@ function api_call_batch() {
 		"${CLIENT_ID}" "${CLIENT_SECRET}" "${REFESH_TOKEN}")
 
 	if [[ -z ${ACCESS_TOKEN} || ${ACCESS_TOKEN} == 'null' ]]; then
-		echo -e "获得令牌失败，结束任务!"
-		exit
+		echo -e "获得令牌失败，结束任务!\\n"
+		return 1
 	fi
 
 	# 线程数透传
@@ -138,7 +172,8 @@ function api_call_batch() {
 }
 
 function get_api_random() {
-	local API_LIST=$(cat "${API_LIST_FILE}")
+	# local API_LIST=$(cat "${API_LIST_FILE}")
+	local API_LIST=$(echo -e "$(api_list)"  | awk '{print $1}' | grep -v "^$")
 	local TOTAL_API_COUNT=$(echo -e "${API_LIST}" | wc -l)
 	
 	local NUM=$((RANDOM % $[TOTAL_API_COUNT] + 1))
@@ -184,6 +219,8 @@ function main() {
 		echo -e "${CLIENT_NAME} ----开始调用----"
 		api_call_batch "${API_LIST}" "${CLIENT_NAME}" "${CLIENT_ID}" \
 			"${CLIENT_SECRET}" "${REFESH_TOKEN}"
+		if [[ $? -eq 1 ]]; then continue; fi
+
 		local API_COUNT=$(echo -e "${API_LIST}" | sort | uniq | wc -l)
 		local COUNT=$(echo -e "${API_LIST}" | wc -l)
 
