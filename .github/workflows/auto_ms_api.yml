@@ -7,7 +7,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: 迁出代码
+    - name: 迁入代码
       uses: actions/checkout@v2
       with:
         token: ${{ secrets.GH_TOKEN }}
@@ -27,14 +27,11 @@ jobs:
         # REFESH_TOKEN3: ${{ secrets.REFESH_TOKEN3 }}
       run: |
         ./graph_api_app.sh
-    - name: 提交更改
+    - name: 计划下一次调用任务
       run: |
         git config --global user.email "hansyow@gmail.com"
         git config --global user.name "hansyao"      
         git pull
         git add .github/workflows/auto_ms_api.yml
         git commit -m "schedule updated"
-    - name: 推送更改
-      uses:  ad-m/github-push-action@master
-      with:
-         branch: master
+        git push -u origin master
