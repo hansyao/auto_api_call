@@ -172,7 +172,6 @@ function api_call_batch() {
 }
 
 function get_api_random() {
-	# local API_LIST=$(cat "${API_LIST_FILE}")
 	local API_LIST=$(echo -e "$(api_list)"  | awk '{print $1}' | grep -v "^$")
 	local TOTAL_API_COUNT=$(echo -e "${API_LIST}" | wc -l)
 	
