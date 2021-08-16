@@ -27,7 +27,7 @@ function get_client_info() {
 
 	env | grep 'CLIENT_ID' | sort | uniq | cut -d "=" -f1 >${CLIENT_NAME}
 	env | grep 'CLIENT_ID' | sort | uniq | cut -d "=" -f2 >${CLIENT_ID}
-	env | grep 'CLIENT_SECRET' sort | uniq | cut -d "=" -f2 >${CLIENT_SECRET}
+	env | grep 'CLIENT_SECRET' | sort | uniq | cut -d "=" -f2 >${CLIENT_SECRET}
 	env | grep 'REFESH_TOKEN' |sort | uniq | cut -d "=" -f2 >${REFESH_TOKEN}
 
 	paste "${CLIENT_NAME}" "${CLIENT_ID}"  "${CLIENT_SECRET}" "${REFESH_TOKEN}" | grep -v '^$'
