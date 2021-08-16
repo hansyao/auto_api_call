@@ -46,7 +46,7 @@ function multi_process_kill() {
 	do
 		# echo -e "正在退出 当前线程数" $(ps -ef | grep $(basename $0) | grep -v "grep" | wc -l)
 		if [[ $(ps -ef | grep ${PROCESS_NAME} | grep -v grep | wc -l) -le 6 ]]; then
-			if [[ $[i] -le 5 ]]; then
+			if [[ $[i] -le 2 ]]; then
 				sleep 1
 				let i++
 				continue
