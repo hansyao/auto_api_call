@@ -2,7 +2,7 @@
 
 REDIRECT_URI='http://localhost:53682/'
 THREADNUMBER=10	# 多线程的线程数：默认10,可根据实际性能表现调整
-FREQUENCY=60 	# 频率（确定下一次运行的时间）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】
+FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
 
 function account_env() {
 	export CLIENT_ID1=''
