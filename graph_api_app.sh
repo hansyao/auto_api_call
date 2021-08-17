@@ -3,6 +3,7 @@
 REDIRECT_URI='http://localhost:53682/'
 THREADNUMBER=10	# 多线程的线程数：默认10,可根据实际性能表现调整
 FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
+PLATFORM=1	# 1. Github Actions; 2. 腾讯云函数; 3. VPS
 
 function account_env() {
 	export CLIENT_ID1=''
@@ -189,16 +190,33 @@ function get_api_random() {
 function update_cron() {
 	local H=$1
 	local M=$2
+	local PLATFORM=$3
 
 	# Github Actions自动任务
-	local GITHUB_ACTION=.github/workflows/auto_ms_api.yml
-	local CRON="- cron: '${M} ${H} * * *'"
-	sed -i s/\-\ cron".*/${CRON}"/ ${GITHUB_ACTION}
+	if [[ $[PLATFORM] -eq 1 ]]; then
+		local GITHUB_ACTION=.github/workflows/auto_ms_api.yml
+		local CRON="- cron: '${M} ${H} * * *'"
+		sed -i s/\-\ cron".*/${CRON}"/ ${GITHUB_ACTION}
+	# 腾讯云函数自动任务
+	elif [[ $[PLATFORM] -eq 2 ]]; then
+		local CRON="0 ${M} ${H} * * * *"
+		python trigger.py 'DeleteTrigger' 'graph_api'
+		sleep 1
+		python trigger.py 'CreateTrigger' 'graph_api' "${CRON}"
+	elif [[ $[PLATFORM] -eq 3 ]]; then
+		crontab -l | { cat; echo -e \
+		"0 ${M} ${H} * * * *	`pwd`/$(basename $0)"; } | crontab -
+	else
+		echo -e "platform 参数不正确!"
+		return 1
+	fi	
 }
 
 function main() {
 	RESULTS_FILE="$(mktemp)"
-	# account_env
+	if [[ $[PLATFORM] -eq 3 ]]; then
+		account_env
+	fi
 	local CLIENT_LIST=$(get_client_info)
 	echo -e "测试令牌"
 	echo -e "${CLIENT_LIST}\\n"
@@ -240,7 +258,7 @@ function main() {
 	local UPCOMMING_SCHEDULED=$(( $(date +%s) + $RANDOM % $(($[FREQUENCY] * 60)) + 600 ))
 	local H=$[$(date -d @$[UPCOMMING_SCHEDULED] +%k)]
 	local M=$[$(date -d @$[UPCOMMING_SCHEDULED] +%M)]
-	update_cron $H $M
+	update_cron $H $M $[PLATFORM]
 
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
