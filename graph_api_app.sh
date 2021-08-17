@@ -111,26 +111,28 @@ function update_access_token() {
 		${TOKEN_URL} | jq -r '.access_token'
 }
 
-function api_call() {
-	local API=$1
-	local ACCESS_TOKEN=$2
+function api_call_one() {
+	ACCESS_TOKEN=$1
+	API=$2
 
-	local STATUS=$(curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
+	curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Bearer ${ACCESS_TOKEN}" \
 		-w "%{http_code}" \
 		-o /dev/null \
-		${API})
+		${API}
+}
+
+function api_call() {
+	local API=$1
+	local ACCESS_TOKEN=$2
+
+	local STATUS=$(api_call_one ${ACCESS_TOKEN} ${API})
 
 	if [[ $[STATUS] -eq 200 ]]; then
 		local RE=$(echo -e "API调用成功：	${API}")
 	else
-		local STATUS=$(curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
-			-H "Content-Type: application/json" \
-			-H "Authorization: Bearer ${ACCESS_TOKEN}" \
-			-w "%{http_code}" \
-			-o /dev/null \
-			${API})	
+		local STATUS=$(api_call_one ${ACCESS_TOKEN} ${API})
 		if [[ $[STATUS] -ne 200 ]]; then
 			local RE=$(echo -e "API调用失败:	${API}")
 		fi
