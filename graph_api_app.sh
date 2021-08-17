@@ -270,7 +270,10 @@ function main() {
 	local H=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%k)))
 	local M=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%M)))
 	update_cron $H $M $[PLATFORM]
-
+	if [[ $? -eq 1 ]]; then
+		"计划任务设置失败......"
+		exit
+	fi
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
 
