@@ -82,7 +82,7 @@ function multi_process_kill() {
 		local THREADS=$(ps -ef | grep ${PROCESS_NAME} | grep -v grep | wc -l)
 		if [[ $[THREADS] -le 1 ]]; then break; fi
 		if [[ $[THREADS] -le 6 ]]; then
-			if [[ $[i] -le 3 ]]; then
+			if [[ $[i] -le 5 ]]; then
 				sleep 1
 				let i++
 				continue
@@ -101,7 +101,7 @@ function update_access_token() {
 	local REFESH_TOKEN="${REFESH_TOKEN}"	
 	local GRANT_TYPE='refresh_token'
 	local TOKEN_URL='https://login.microsoftonline.com/common/oauth2/v2.0/token'
-	curl -s \
+	curl --connect-timeout 2 -m 4 -s \
 		-H "Content-Type: application/x-www-form-urlencoded" \
 		-d "grant_type=${GRANT_TYPE}" \
 		-d "refresh_token=${REFESH_TOKEN}" \
@@ -115,7 +115,7 @@ function api_call() {
 	local API=$1
 	local ACCESS_TOKEN=$2
 
-	local STATUS=$(curl -s -i \
+	local STATUS=$(curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Bearer ${ACCESS_TOKEN}" \
 		-w "%{http_code}" \
@@ -125,7 +125,15 @@ function api_call() {
 	if [[ $[STATUS] -eq 200 ]]; then
 		local RE=$(echo -e "API调用成功：	${API}")
 	else
-		local RE=$(echo -e "API调用失败:	${API}")
+		local STATUS=$(curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
+			-H "Content-Type: application/json" \
+			-H "Authorization: Bearer ${ACCESS_TOKEN}" \
+			-w "%{http_code}" \
+			-o /dev/null \
+			${API})	
+		if [[ $[STATUS] -ne 200 ]]; then
+			local RE=$(echo -e "API调用失败:	${API}")
+		fi
 	fi
 
 	echo -e "${RE}"
@@ -199,10 +207,11 @@ function update_cron() {
 		sed -i s/\-\ cron".*/${CRON}"/ ${GITHUB_ACTION}
 	# 腾讯云函数自动任务
 	elif [[ $[PLATFORM] -eq 2 ]]; then
-		local CRON="0 ${M} ${H} * * * *"
-		python trigger.py 'DeleteTrigger' 'graph_api'
+		local CRON="0 ${M} $(($(($[H]+8)) % 24)) * * * *"
+		python trigger.py 'DeleteTrigger' 'graph_api' "${CRON}"
 		sleep 1
 		python trigger.py 'CreateTrigger' 'graph_api' "${CRON}"
+	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
 		crontab -l | { cat; echo -e \
 		"0 ${M} ${H} * * * *	`pwd`/$(basename $0)"; } | crontab -
@@ -256,8 +265,8 @@ function main() {
 	done
 
 	local UPCOMMING_SCHEDULED=$(( $(date +%s) + $RANDOM % $(($[FREQUENCY] * 60)) + 600 ))
-	local H=$[$(date -d @$[UPCOMMING_SCHEDULED] +%k)]
-	local M=$[$(date -d @$[UPCOMMING_SCHEDULED] +%M)]
+	local H=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%k)))
+	local M=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%M)))
 	update_cron $H $M $[PLATFORM]
 
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
