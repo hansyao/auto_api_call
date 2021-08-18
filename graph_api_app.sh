@@ -132,10 +132,7 @@ function api_call() {
 	if [[ $[STATUS] -eq 200 ]]; then
 		local RE=$(echo -e "API调用成功：	${API}")
 	else
-		local STATUS=$(api_call_one ${ACCESS_TOKEN} ${API})
-		if [[ $[STATUS] -ne 200 ]]; then
-			local RE=$(echo -e "API调用失败:	${API}")
-		fi
+		local RE=$(echo -e "API调用失败:	${API}")
 	fi
 
 	echo -e "${RE}"
