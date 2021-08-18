@@ -226,8 +226,8 @@ function main() {
 		account_env
 	fi
 	local CLIENT_LIST=$(get_client_info)
-	echo -e "测试令牌"
-	echo -e "${CLIENT_LIST}\\n"
+	# echo -e "测试令牌"
+	# echo -e "${CLIENT_LIST}\\n"
 	if [[ -z ${CLIENT_LIST} ]]; then
 		echo "API账号未设置, 结束任务"
 		exit 0
