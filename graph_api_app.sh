@@ -107,12 +107,13 @@ function update_access_token() {
 	local CLIENT_ID=$1
 	local CLIENT_SECRET=$2
 	local REFESH_TOKEN=$3
+	local USER_AGENT=$(fake_user_agent)
 
 	local REFESH_TOKEN="${REFESH_TOKEN}"	
 	local GRANT_TYPE='refresh_token'
 	local TOKEN_URL='https://login.microsoftonline.com/common/oauth2/v2.0/token'
 	curl --connect-timeout 2 -m 4 -s \
-		-A "$(fake_user_agent)" \
+		-A "${USER_AGENT}" \
 		-H "Content-Type: application/x-www-form-urlencoded" \
 		-d "grant_type=${GRANT_TYPE}" \
 		-d "refresh_token=${REFESH_TOKEN}" \
@@ -123,11 +124,12 @@ function update_access_token() {
 }
 
 function api_call_one() {
-	ACCESS_TOKEN=$1
-	API=$2
+	local ACCESS_TOKEN=$1
+	local API=$2
+	local USER_AGENT=$(fake_user_agent)
 
 	curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
-		-A "$(fake_user_agent)" \
+		-A "${USER_AGENT}" \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Bearer ${ACCESS_TOKEN}" \
 		-w "%{http_code}" \
