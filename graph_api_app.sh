@@ -93,6 +93,16 @@ function multi_process_kill() {
 	done
 }
 
+function get_user_agent() {
+	local LIST=$(cat user_agent.txt | sort | uniq)
+	local TOTAL_COUNT=$(echo -e "${LIST}" | wc -l)
+	local NUM=$(( RANDOM % $[TOTAL_COUNT]))
+	if [[ $[NUM] -eq 0 ]]; then
+		local NUM=$(($NUM + 1))
+	fi
+	echo -e "${LIST}" | sed -n "${NUM}p"
+}
+
 function update_access_token() {
 	local CLIENT_ID=$1
 	local CLIENT_SECRET=$2
@@ -102,6 +112,7 @@ function update_access_token() {
 	local GRANT_TYPE='refresh_token'
 	local TOKEN_URL='https://login.microsoftonline.com/common/oauth2/v2.0/token'
 	curl --connect-timeout 2 -m 4 -s \
+		-A "$(get_user_agent)" \
 		-H "Content-Type: application/x-www-form-urlencoded" \
 		-d "grant_type=${GRANT_TYPE}" \
 		-d "refresh_token=${REFESH_TOKEN}" \
@@ -116,6 +127,7 @@ function api_call_one() {
 	API=$2
 
 	curl --connect-timeout 2 --retry-delay 1 --retry 2 -m 4 -s -i \
+		-A "$(get_user_agent)" \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Bearer ${ACCESS_TOKEN}" \
 		-w "%{http_code}" \
