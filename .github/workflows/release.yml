@@ -1,0 +1,35 @@
+name: 构建自动发行
+on: 
+  workflow_dispatch:
+
+jobs: 
+  build:
+    name: 发行云函数
+    runs-on: ubuntu-latest
+    steps:
+      - name: 迁出代码
+        uses: actions/checkout@v2
+      - name: 打包云函数 # This would actually build your project, using zip for an example artifact
+        run: |
+          sed -i s/PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
+          zip -r auto_api_call.zip ./ -x ".git/*" -x ".github/*"
+      - name: 构建发行版
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: 上传发行版资产
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./auto_api_call.zip
+          asset_name: auto_api_call.zip
+          asset_content_type: application/zip
