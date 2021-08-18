@@ -267,7 +267,7 @@ function main() {
 	done
 
 	local UPCOMMING_SCHEDULED=$(( $(date +%s) + $RANDOM % $(($[FREQUENCY] * 60)) + 600 ))
-	local H=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%k)))
+	local H=$(($(date -d @$[UPCOMMING_SCHEDULED] +%k)))
 	local M=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%M)))
 	update_cron $H $M $[PLATFORM]
 	if [[ $? -eq 1 ]]; then
