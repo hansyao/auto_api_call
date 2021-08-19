@@ -221,9 +221,9 @@ function update_cron() {
 	# 腾讯云函数自动任务
 	elif [[ $[PLATFORM] -eq 2 ]]; then
 		local CRON="0 ${M} $(($(($[H]+8)) % 24)) * * * *"
-		python trigger.py 'DeleteTrigger' 'graph_api' "${CRON}"
+		./trigger.sh 'DeleteTrigger' 'graph_api' "${CRON}"
 		sleep 1
-		python trigger.py 'CreateTrigger' 'graph_api' "${CRON}"
+		./trigger.sh 'CreateTrigger' 'graph_api' "${CRON}"
 	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
 		crontab -l | { cat; echo -e \
@@ -231,7 +231,7 @@ function update_cron() {
 	else
 		echo -e "platform 参数不正确!"
 		return 1
-	fi	
+	fi
 }
 
 function main() {
