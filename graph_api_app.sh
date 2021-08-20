@@ -221,9 +221,10 @@ function update_cron() {
 	# 腾讯云函数自动任务
 	elif [[ $[PLATFORM] -eq 2 ]]; then
 		local CRON="0 ${M} $(($(($[H]+8)) % 24)) * * * *"
-		./trigger.sh 'DeleteTrigger' 'graph_api' "${CRON}"
+		source ./trigger.sh
+		post_result_func_trigger 'DeleteTrigger' 'graph_api' "${CRON}"
 		sleep 1
-		./trigger.sh 'CreateTrigger' 'graph_api' "${CRON}"
+		post_result_func_trigger 'CreateTrigger' 'graph_api' "${CRON}"
 	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
 		crontab -l | { cat; echo -e \
@@ -288,4 +289,4 @@ function main() {
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
 
-main
+# main
