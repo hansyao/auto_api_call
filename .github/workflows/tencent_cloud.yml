@@ -24,4 +24,4 @@ jobs:
         SECRET_ID: ${{ secrets.TC_SECRET_ID }}
         SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
       run: |
-        ./trigger.sh
+        ./trigger.sh CreateFunction auto_graph_api
