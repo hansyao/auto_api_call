@@ -289,4 +289,4 @@ function main() {
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
 
-# main
+main
