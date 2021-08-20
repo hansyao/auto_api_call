@@ -219,29 +219,29 @@ function post_result_func() {
 	rm -f ${BODY_JSON}
 }
 
-FUNC_TRIGGER=$1
+ACTION=$1
 FUNC_NAME=$2
 ZIP_FILE=/tmp/${FUNC_NAME}.zip
 
-if [[ -z ${FUNC_TRIGGER} || -z ${FUNC_NAME} ]]; then
+if [[ -z ${ACTION} || -z ${FUNC_NAME} ]]; then
 	echo "缺少函数名或触发方式"
 	exit 0
 fi
-if [[ ${FUNC_TRIGGER} == 'CreateFunction' ]]; then
+if [[ ${ACTION} == 'CreateFunction' ]]; then
 	echo '删除同名函数（如有）'
 	post_result_func DeleteFunction "${FUNC_NAME}"
 	echo '打包云函数'
 	sed -i s/^PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
 	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
 	echo '远程创建函数'
-	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
+	post_result_func "${ACTION}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
 	rm -rf  ${ZIP_FILE}
 	echo '等待5秒钟待函数创建完成'
 	sleep 5
 	echo '开始远程触发运行函数, 请到腾讯云函数平台检查是否成功'
 	post_result_func Invoke "${FUNC_NAME}"
-elif [[ ${FUNC_TRIGGER} == 'CreateTrigger' || ${FUNC_TRIGGER} == 'DeleteTrigger' ]]; then
+elif [[ ${ACTION} == 'CreateTrigger' || ${ACTION} == 'DeleteTrigger' ]]; then
 	post_result_func_trigger $1 $2 $3
 else
-	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}"
+	post_result_func "${ACTION}" "${FUNC_NAME}"
 fi
