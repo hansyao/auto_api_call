@@ -223,5 +223,5 @@ function post_result_func() {
 # post_result_func DeleteFunction mytest
 
 zip -r /tmp/tencent_cloud_auto_api_call.zip ./ -x ".git/*" -x ".github/*"
-post_result_func UpdateFunctionCode mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
+post_result_func CreateFunction mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
 rm -rf  /tmp/tencent_cloud_auto_api_call.zip
