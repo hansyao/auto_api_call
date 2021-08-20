@@ -1,9 +1,11 @@
 #!/bin/bash
 
-REDIRECT_URI='http://localhost:53682/'
-THREADNUMBER=10	# 多线程的线程数：默认10,可根据实际性能表现调整
-FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
-PLATFORM=1	# 1. Github Actions; 2. 腾讯云函数; 3. VPS
+function base() {
+	REDIRECT_URI='http://localhost:53682/'
+	THREADNUMBER=10	# 多线程的线程数：默认10,可根据实际性能表现调整
+	FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
+	PLATFORM=1	# 1. Github Actions; 2. 腾讯云函数; 3. VPS
+}
 
 function account_env() {
 	export CLIENT_ID1=''
@@ -236,6 +238,7 @@ function update_cron() {
 }
 
 function main() {
+	base
 	RESULTS_FILE="$(mktemp)"
 	if [[ $[PLATFORM] -eq 3 ]]; then
 		account_env
@@ -288,5 +291,3 @@ function main() {
 	fi
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
-
-main
