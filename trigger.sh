@@ -231,13 +231,13 @@ if [[ ${FUNC_TRIGGER} == 'CreateFunction' ]]; then
 	echo '删除同名函数（如有）'
 	post_result_func DeleteFunction "${FUNC_NAME}"
 	echo '打包云函数'
-	sed -i s/PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
+	sed -i s/^PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
 	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
 	echo '远程创建函数'
 	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
 	rm -rf  ${ZIP_FILE}
-	echo '等待10秒钟待函数创建完成'
-	sleep 10
+	echo '等待5秒钟待函数创建完成'
+	sleep 5
 	echo '开始远程触发运行函数, 请到腾讯云函数平台检查是否成功'
 	post_result_func Invoke "${FUNC_NAME}"
 else
