@@ -219,9 +219,19 @@ function post_result_func() {
 	rm -f ${BODY_JSON}
 }
 
+FUNC_TRIGGER=$1
+FUNC_NAME=$2
+ZIP_FILE=$(mktemp)
 
-# post_result_func DeleteFunction mytest1
-
-zip -r /tmp/tencent_cloud_auto_api_call.zip ./ -x ".git/*" -x ".github/*"
-post_result_func CreateFunction mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
-rm -rf  /tmp/tencent_cloud_auto_api_call.zip
+if [[ -z ${FUNC_TRIGGER} || -z ${FUNC_NAME} ]]; then
+	echo "缺少函数名或触发方式"
+	exit 0
+fi
+if [[ -z ${FUNC_TRIGGER} == 'CreateFunction' ]];then
+	post_result_func DeleteFunction "${FUNC_NAME}"
+	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
+	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
+	rm -rf  ${ZIP_FILE}
+else
+	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}"
+fi
