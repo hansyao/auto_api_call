@@ -9,7 +9,7 @@
 				"inputs": {
 					"functions": [{
 						"name": "auto_ms_api",
-						"src": "./",
+						"functionRootPath": "./",
 						"memorySize": 64,
 						"timeout": 5,
 						"runtime": "CustomRuntime",
