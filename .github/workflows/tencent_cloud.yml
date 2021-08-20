@@ -1,0 +1,27 @@
+name: 发布腾讯云函数
+on: 
+  workflow_dispatch:
+
+jobs: 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 迁出代码
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+    - name: 设置时区
+      run: |
+        sudo timedatectl set-timezone 'UTC'
+    - name: 调用API
+      env:
+        CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
+        CLIENT_SECRET1: ${{ secrets.CLIENT_SECRET1 }}
+        REFESH_TOKEN1: ${{ secrets.REFESH_TOKEN1 }}
+        CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
+        CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
+        REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
+        TC_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+        TC_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+      run: |
+        ./trigger.sh
