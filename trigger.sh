@@ -1,6 +1,6 @@
 #!/bin/bash
 
-timestamp() {
+function timestamp() {
 	if [ $1 -eq 1 ]; then
 		echo -e $(date -u +%s)
 	elif [ $1 -eq 2 ]; then
@@ -10,7 +10,7 @@ timestamp() {
 	fi
 }
 
-env_var() {
+function env_var() {
 	source ./graphi_api_app.sh
 	local CLIENT_LIST=$(get_client_info)
 	if [[ -z ${CLIENT_LIST} ]]; then
@@ -58,7 +58,7 @@ EOF
 
 }
 
-auth_sign() {
+function auth_sign() {
 	local SECRETID=${SECRET_ID}
 	local SECRETKEY=${SECRET_KEY}
 	local HMAC256="$(mktemp)"
@@ -95,7 +95,7 @@ ${ENTER}${HASHED_REQUEST}"
 	 'SignedHeaders='${SIGED_HEADERS}, Signature=${SIGNATURE}
 }
 
-post_result_func_trigger() {
+function post_result_func_trigger() {
 	ACTION=$1
 	TRIGGER_NAME=$2
 	TRIGGER_DESC=$3
@@ -123,7 +123,7 @@ post_result_func_trigger() {
 }
 
 
-post_result_func() {
+function post_result_func() {
 	ACTION=$1
 	FUNC_NAME=$2
 	ZIPFILE=$3
