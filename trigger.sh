@@ -241,7 +241,7 @@ if [[ $1 == 'CreateFunction' ]]; then
 	echo '开始远程触发运行函数, 请到腾讯云函数平台检查是否成功'
 	post_result_func Invoke "${FUNC_NAME}"
 elif [[ $1 == 'CreateTrigger' || $1 == 'DeleteTrigger' ]]; then
-	post_result_func_trigger $1 $2 $3
+	post_result_func_trigger "$1" "$2" "$3"
 else
 	post_result_func $1 $2
 fi
