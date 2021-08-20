@@ -233,6 +233,8 @@ if [[ ${ACTION} == 'CreateFunction' ]]; then
 	echo '打包云函数'
 	sed -i s/^PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
 	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
+	echo '等待5秒待删除完成'
+	sleep 5
 	echo '远程创建函数'
 	post_result_func "${ACTION}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
 	rm -rf  ${ZIP_FILE}
