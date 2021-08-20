@@ -221,7 +221,6 @@ function update_cron() {
 	# 腾讯云函数自动任务
 	elif [[ $[PLATFORM] -eq 2 ]]; then
 		local CRON="0 ${M} $(($(($[H]+8)) % 24)) * * * *"
-		source ./trigger.sh
 		./trigger.sh 'DeleteTrigger' 'graph_api' "${CRON}"
 		sleep 1
 		./trigger.sh 'CreateTrigger' 'graph_api' "${CRON}"
