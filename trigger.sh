@@ -228,10 +228,14 @@ if [[ -z ${FUNC_TRIGGER} || -z ${FUNC_NAME} ]]; then
 	exit 0
 fi
 if [[ ${FUNC_TRIGGER} == 'CreateFunction' ]]; then
+	echo '删除同名函数（如有）'
 	post_result_func DeleteFunction "${FUNC_NAME}"
 	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
+	echo '创建函数'
 	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
 	rm -rf  ${ZIP_FILE}
+	echo '远程触发运行函数, 请到腾讯云函数平台检查是否成功'
+	post_result_func Invoke "${FUNC_NAME}"
 else
 	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}"
 fi
