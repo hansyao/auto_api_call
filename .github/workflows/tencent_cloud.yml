@@ -21,7 +21,7 @@ jobs:
         CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
         CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
         REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
-        SECRET_ID: ${{ secrets.TC_SECRET_ID }}
-        SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
+        TC_SECRET_ID: ${{ secrets.TC_SECRET_ID }}
+        TC_SECRET_KEY: ${{ secrets.TC_SECRET_KEY }}
       run: |
         ./trigger.sh CreateFunction auto_graph_api
