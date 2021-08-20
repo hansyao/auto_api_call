@@ -219,7 +219,7 @@ function post_result_func() {
 	rm -f ${BODY_JSON}
 }
 
-ZIP_FILE=/tmp/${FUNC_NAME}.zip
+ZIP_FILE=/tmp/$2.zip
 
 if [[ -z $1 || -z $2 ]]; then
 	echo "缺少函数名或触发方式"
