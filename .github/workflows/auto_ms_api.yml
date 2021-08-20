@@ -26,8 +26,7 @@ jobs:
         # CLIENT_SECRET3: ${{ secrets.CLIENT_SECRET3 }}
         # REFESH_TOKEN3: ${{ secrets.REFESH_TOKEN3 }}
       run: |
-        source ./graph_api_app.sh
-        main
+        ./graph_api_app.sh
     - name: 提交更改生效
       run: |
         git config --global user.email "hansyow@gmail.com"

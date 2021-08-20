@@ -238,7 +238,6 @@ function update_cron() {
 }
 
 function main() {
-	base
 	RESULTS_FILE="$(mktemp)"
 	if [[ $[PLATFORM] -eq 3 ]]; then
 		account_env
@@ -291,3 +290,5 @@ function main() {
 	fi
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
+
+main
