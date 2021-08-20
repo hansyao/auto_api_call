@@ -54,8 +54,8 @@ function env_var() {
 	# 腾讯环境变量
 	TC_SECRET_ID=$(env | grep TC_SECRET_ID | cut -d "=" -f2)
 	TC_SECRET_KEY=$(env | grep TC_SECRET_KEY | cut -d "=" -f2)
-	echo -n "{\"Key\":\"SECRET_ID\", \"Value\":\"${TC_SECRET_ID}\"},"
-	echo -n "{\"Key\":\"SECRET_KEY\", \"Value\":\"${TC_SECRET_KEY}\"},"
+	echo -n "{\"Key\":\"TC_SECRET_ID\", \"Value\":\"${TC_SECRET_ID}\"},"
+	echo -n "{\"Key\":\"TC_SECRET_KEY\", \"Value\":\"${TC_SECRET_KEY}\"},"
 }
 
 function hmac256_py() {
@@ -87,8 +87,8 @@ EOF
 }
 
 function auth_sign() {
-	local SECRETID=${SECRET_ID}
-	local SECRETKEY=${SECRET_KEY}
+	local SECRETID=${TC_SECRET_ID}
+	local SECRETKEY=${TC_SECRET_KEY}
 	local HMAC256="$(mktemp)"
 	local ENTER=$'\n'
 	local TIME=$1
