@@ -15,6 +15,10 @@
 						"runtime": "CustomRuntime",
 						"handler": "index.main_handler",
 						"region": "ap-shanghai",
+						"src": 
+							{
+								"src": "./src"
+						},
 						"envVariables": {
 							"TC_SECRET_ID": "${{env.TC_SECRET_ID}}",
 							"TC_SECRET_KEY": "${{env.TC_SECRET_KEY}}",
