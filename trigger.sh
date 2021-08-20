@@ -236,7 +236,7 @@ if [[ ${ACTION} == 'CreateFunction' ]]; then
 	echo '等待5秒待删除完成'
 	sleep 5
 	echo '远程创建函数'
-	post_result_func "${ACTION}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
+	post_result_func CreateFunction "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
 	rm -rf  ${ZIP_FILE}
 	echo '等待5秒钟待函数创建完成'
 	sleep 5
