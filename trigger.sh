@@ -227,7 +227,7 @@ if [[ -z ${FUNC_TRIGGER} || -z ${FUNC_NAME} ]]; then
 	echo "缺少函数名或触发方式"
 	exit 0
 fi
-if [[ -z ${FUNC_TRIGGER} == 'CreateFunction' ]];then
+if [[ -z ${FUNC_TRIGGER} == 'CreateFunction' ]]; then
 	post_result_func DeleteFunction "${FUNC_NAME}"
 	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
 	post_result_func "${FUNC_TRIGGER}" "${FUNC_NAME}" $(cat  ${ZIP_FILE} | base64 -w 0) 
