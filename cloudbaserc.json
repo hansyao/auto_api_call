@@ -9,10 +9,12 @@
 				"inputs": {
 					"functions": [{
 						"name": "auto_ms_api",
+						"src": "./",
 						"memorySize": 64,
 						"timeout": 5,
 						"runtime": "CustomRuntime",
-						"handler": "index.main",
+						"handler": "index.main_handler",
+						"region": "ap-shanghai",
 						"envVariables": {
 							"TC_SECRET_ID": "${{env.TC_SECRET_ID}}",
 							"TC_SECRET_KEY": "${{env.TC_SECRET_KEY}}",
