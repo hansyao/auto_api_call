@@ -221,7 +221,7 @@ function post_result_func() {
 
 FUNC_TRIGGER=$1
 FUNC_NAME=$2
-ZIP_FILE=$(mktemp)
+ZIP_FILE=/tmp/${FUNC_NAME}.zip
 
 if [[ -z ${FUNC_TRIGGER} || -z ${FUNC_NAME} ]]; then
 	echo "缺少函数名或触发方式"
