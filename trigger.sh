@@ -44,10 +44,11 @@ function env_var() {
 		local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $3}')
 		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $4}')
 		
+
 		
 		echo -n "{\"Key\":\"CLIENT_ID${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
-		echo -n "{\"Key\":\"CLIENT_SECRET${NAME}\", \"Value\":\"${CLIENT_SECRET}\"},"
-		echo -n "{\"Key\":\"REFESH_TOKEN${NAME}\", \"Value\":\"${REFESH_TOKEN}\"},"
+		echo -n "{\"Key\":\"CLIENT_SECRET${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
+		echo -n "{\"Key\":\"REFESH_TOKEN${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
 
 	done
 	# 腾讯环境变量
@@ -179,14 +180,6 @@ function post_result_func() {
 		\"Environment\": {\"Variables\": [$(env_var | sed s/.$//g)]}}" \
 		>${BODY_JSON}
 
-	elif [[ ${ACTION} == 'UpdateFunctionConfiguration' ]]; then
-		echo -e "{\"FunctionName\": \"${FUNC_NAME}\", \
-		\"Runtime\": \"${RUNTIME}\", \
-		\"MemorySize\": ${MEM}, \
-		\"Timeout\": ${TIMEOUT}, \
-		\"Environment\": {\"Variables\": [$(env_var | sed s/.$//g)]}}" \
-		>${BODY_JSON}
-
 	elif [[ ${ACTION} == 'UpdateFunctionCode' ]]; then
 		echo -e "{\"FunctionName\": \"${FUNC_NAME}\", \
 		\"Handler\": \"${HANDLER}\", \
@@ -205,7 +198,6 @@ function post_result_func() {
 		echo -e "此脚本仅支持: \\n\
 		CreateFunction	创建函数\\n\
 		UpdateFunctionCode	更新函数代码\\n\
-		UpdateFunctionConfiguration	更新函数环境变量\\n\
 		DeleteFunction	删除函数\\n\
 		Invoke	运行函数\\n"
 	fi
@@ -227,9 +219,9 @@ function post_result_func() {
 	rm -f ${BODY_JSON}
 }
 
-post_result_func DeleteFunction mytest
 
+# post_result_func DeleteFunction mytest
 
-# zip -r /tmp/tencent_cloud_auto_api_call.zip ./ -x ".git/*" -x ".github/*"
-# post_result_func UpdateFunctionConfiguration mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
-# rm -rf  /tmp/tencent_cloud_auto_api_call.zip
+zip -r /tmp/tencent_cloud_auto_api_call.zip ./ -x ".git/*" -x ".github/*"
+post_result_func UpdateFunctionCode mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
+rm -rf  /tmp/tencent_cloud_auto_api_call.zip
