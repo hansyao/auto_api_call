@@ -222,9 +222,9 @@ function update_cron() {
 	elif [[ $[PLATFORM] -eq 2 ]]; then
 		local CRON="0 ${M} $(($(($[H]+8)) % 24)) * * * *"
 		source ./trigger.sh
-		post_result_func_trigger 'DeleteTrigger' 'graph_api' "${CRON}"
+		./trigger.sh 'DeleteTrigger' 'graph_api' "${CRON}"
 		sleep 1
-		post_result_func_trigger 'CreateTrigger' 'graph_api' "${CRON}"
+		./trigger.sh 'CreateTrigger' 'graph_api' "${CRON}"
 	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
 		crontab -l | { cat; echo -e \
