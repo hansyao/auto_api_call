@@ -47,8 +47,8 @@ function env_var() {
 
 		
 		echo -n "{\"Key\":\"CLIENT_ID${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
-		echo -n "{\"Key\":\"CLIENT_SECRET${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
-		echo -n "{\"Key\":\"REFESH_TOKEN${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
+		echo -n "{\"Key\":\"CLIENT_SECRET${NAME}\", \"Value\":\"${CLIENT_SECRET}\"},"
+		echo -n "{\"Key\":\"REFESH_TOKEN${NAME}\", \"Value\":\"${REFESH_TOKEN}\"},"
 
 	done
 	# 腾讯环境变量
@@ -220,8 +220,8 @@ function post_result_func() {
 }
 
 
-# post_result_func DeleteFunction mytest
+post_result_func DeleteFunction mytest1
 
-zip -r /tmp/tencent_cloud_auto_api_call.zip ./ -x ".git/*" -x ".github/*"
-post_result_func CreateFunction mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
-rm -rf  /tmp/tencent_cloud_auto_api_call.zip
+# zip -r /tmp/tencent_cloud_auto_api_call.zip ./ -x ".git/*" -x ".github/*"
+# post_result_func CreateFunction mytest1 $(cat /tmp/tencent_cloud_auto_api_call.zip | base64 -w 0) 
+# rm -rf  /tmp/tencent_cloud_auto_api_call.zip
