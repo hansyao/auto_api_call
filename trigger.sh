@@ -44,8 +44,6 @@ function env_var() {
 		local CLIENT_SECRET=$(echo -e "${ACCOUNT}" | awk '{print $3}')
 		local REFESH_TOKEN=$(echo -e "${ACCOUNT}" | awk '{print $4}')
 		
-
-		
 		echo -n "{\"Key\":\"CLIENT_ID${NAME}\", \"Value\":\"${CLIENT_ID}\"},"
 		echo -n "{\"Key\":\"CLIENT_SECRET${NAME}\", \"Value\":\"${CLIENT_SECRET}\"},"
 		echo -n "{\"Key\":\"REFESH_TOKEN${NAME}\", \"Value\":\"${REFESH_TOKEN}\"},"
