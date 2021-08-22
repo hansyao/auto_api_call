@@ -218,6 +218,11 @@ function update_cron() {
 		local GITHUB_ACTION=.github/workflows/auto_ms_api.yml
 		local CRON="- cron: '${M} ${H} * * *'"
 		sed -i s/\-\ cron".*/${CRON}"/ ${GITHUB_ACTION}
+		# update readme
+		local UPCOMMING_SCHEDULED=$(( $[UPCOMMING_SCHEDULED] + 3600 * 8 ))
+		local README_TIME="$(date -d @$UPCOMMING_SCHEDULED +%x' '%X) (北京 UTC+8）"
+		sed -i "1d" README.md
+		sed -i "1i 下一次运行时间: ${README_TIME}"  README.md		
 	# 腾讯云函数自动任务
 	elif [[ $[PLATFORM] -eq 2 ]]; then
 		local CRON="0 ${M} $(($(($[H]+8)) % 24)) * * * *"
@@ -277,7 +282,7 @@ function main() {
 	(合计调用:${COUNT}个次; 成功:${SUCCESS_COUNT}次; 失败:${FAILED_COUNT}次)\\n"
 	done
 
-	local UPCOMMING_SCHEDULED=$(( $(date +%s) + $RANDOM % $(($[FREQUENCY] * 60)) + 600 ))
+	UPCOMMING_SCHEDULED=$(( $(date +%s) + $RANDOM % $(($[FREQUENCY] * 60)) + 600 ))
 	local H=$(date -d @$[UPCOMMING_SCHEDULED] +%k)
 	local M=$((10#$(date -d @$[UPCOMMING_SCHEDULED] +%M)))
 	update_cron $H $M $[PLATFORM]
@@ -285,12 +290,6 @@ function main() {
 		"计划任务设置失败......"
 		exit
 	fi
-	# update readme
-	local UPCOMMING_SCHEDULED=$(( $[UPCOMMING_SCHEDULED] + 3600 * 8 ))
-
-	README_TIME="$(date -d @$UPCOMMING_SCHEDULED +%x' '%X) (北京 UTC+8）"
-	sed -i "1d" README.md
-	sed -i "1i 下一次运行时间: ${README_TIME}"  README.md
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
 
