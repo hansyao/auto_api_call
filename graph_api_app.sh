@@ -289,6 +289,7 @@ function main() {
 	local UPCOMMING_SCHEDULED=$(( $[UPCOMMING_SCHEDULED] + 3600 * 8 ))
 
 	README_TIME="$(date -d @$UPCOMMING_SCHEDULED +%x' '%X) (北京 UTC+8）"
+	sed -i "1d" README.md
 	sed -i "1i 下一次运行时间: ${README_TIME}"  README.md
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
