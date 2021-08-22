@@ -241,7 +241,7 @@ if [[ $1 == 'CreateFunction' ]]; then
 	RESPONSE=$(post_result_func GetFunction "${FUNC_NAME}")
 	# 函数不存在，则创建
 	if [[ $(echo -e ${RESPONSE} | jq -r '.Response.Error') == 'null' ]]; then
-		post_result_func CreateFunction $2 $(cat  ${ZIP_FILE} | base64 -w 0) 
+		post_result_func CreateFunction $2 $(cat  ${ZIP_FILE} | base64 -w 0)
 	# 函数存在，则更新
 	else
 		echo '更新环境变量'
