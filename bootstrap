@@ -20,7 +20,7 @@ do
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${USER_CODE_ROOT}/lib
 
   ./graph_api_app.sh
-  RESPONSE="{'status:' 200, 'date:' $(date)}"
+  RESPONSE="{\"status\": 200, \"date\": $(date)}"
   
   # Send the response
   curl -X POST -s "http://$SCF_RUNTIME_API:$SCF_RUNTIME_API_PORT/runtime/invocation/response"  -d "$RESPONSE"
