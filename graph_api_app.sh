@@ -286,7 +286,6 @@ function main() {
 		exit
 	fi
 	# update readme
-	local UPCOMMING_SCHEDULED=$(( $[UPCOMMING_SCHEDULED] + 3600 * 8 ))
 	sed -i s/date\=........../date\="${UPCOMMING_SCHEDULED}"/g README.md
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
