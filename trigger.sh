@@ -87,6 +87,7 @@ EOF
 function auth_sign() {
 	local SECRETID=${TC_SECRET_ID}
 	local SECRETKEY=${TC_SECRET_KEY}
+	local ALGORITHM='TC3-HMAC-SHA256'
 	local HMAC256="$(mktemp)"
 	local ENTER=$'\n'
 	local TIME=$1
@@ -128,7 +129,6 @@ function post_result_func_trigger() {
 	TIME=$(timestamp 1)
 	REGION=${TENCENTCLOUD_REGION}
 	VER='2018-04-16'
-	ALGORITHM='TC3-HMAC-SHA256'
 	TYPE="Content-Type:application/json"
 	HOST='scf.tencentcloudapi.com'
 	BODY="{\"FunctionName\": \"${SCF_FUNCTIONNAME}\", \
@@ -162,7 +162,6 @@ function post_result_func() {
 
 	TIME=$(timestamp 1)
 	VER='2018-04-16'
-	ALGORITHM='TC3-HMAC-SHA256'
 	TYPE='Content-Type:application/json'
 	HOST='scf.tencentcloudapi.com'
 
