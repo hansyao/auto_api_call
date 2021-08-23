@@ -20,7 +20,7 @@
 
 2. **腾讯云函数**(如需要部署)： 
 
-* 在本项目settings->Actions secrets新建两个New secrets命名为**TC_SECRET_ID**和**TC_SECRET_KEY**
+* 在本项目settings->Actions secrets新建两个New secrets命名为**TC_SECRET_ID**和**TC_SECRET_KEY**, 将相应的腾讯密钥ID和密钥复制过来。
 
 3. **微软**
 
