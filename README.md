@@ -39,12 +39,12 @@
 
 ## 运行Actions
 
-转到本项目Actions, 手工运行一次[MS OFFICE 365 E5自动续期](../actions/workflows/auto_ms_api.yml)， 如果运行成功，下一次运行时间会自动改为随机时间，可按需更改[graph_api_app.sh第5行](../blob/b1b34738316828b6adcd4d38c7fa5132a297e9d4/graph_api_app.sh#L5)的运行频率（理论上无需进行任何更改）。
+转到本项目Actions, 手工运行一次[MS OFFICE 365 E5自动续期](../../auto_api_call/actions/workflows/auto_ms_api.yml)， 如果运行成功，下一次运行时间会自动改为随机时间，可按需更改[graph_api_app.sh第5行](../blob/b1b34738316828b6adcd4d38c7fa5132a297e9d4/graph_api_app.sh#L5)的运行频率（理论上无需进行任何更改）。
 ```
 FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
 ```
 
-如需部署到腾讯云函数，可以运行action [发布腾讯云函数](../actions/workflows/tencent_cloud.yml), 如果准备工作3中的密钥填得正确的话，本项目会自动部署到你的腾讯云函数账户里并设定为随机触发。
+如需部署到腾讯云函数，可以运行action [发布腾讯云函数](../../auto_api_call/actions/workflows/tencent_cloud.yml), 如果准备工作3中的密钥填得正确的话，本项目会自动部署到你的腾讯云函数账户里并设定为随机触发。
 
 如需部署到VPS， 复制``graph_api_app.sh``到你的VPS里，运行一次即可。
 
