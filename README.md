@@ -39,7 +39,7 @@
 
 ## 运行Actions
 
-转到本项目Actions, 手工运行一次[MS OFFICE 365 E5自动续期](../../actions/workflows/auto_ms_api.yml)， 如果运行成功，下一次运行时间会自动改为随机时间，可按需更改[graph_api_app.sh第5行](../blob/b1b34738316828b6adcd4d38c7fa5132a297e9d4/graph_api_app.sh#L5)的运行频率（理论上无需进行任何更改）。
+转到本项目Actions, 手工运行一次[MS OFFICE 365 E5自动续期](../../actions/workflows/auto_ms_api.yml)， 如果运行成功，下一次运行时间会自动改为随机时间，可按需更改[graph_api_app.sh第5行](../../blob/b1b34738316828b6adcd4d38c7fa5132a297e9d4/graph_api_app.sh#L5)的运行频率（理论上无需进行任何更改）。
 ```
 FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
 ```
