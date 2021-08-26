@@ -22,7 +22,8 @@ function get_client_info() {
 	env | grep 'CLIENT_SECRET' | sort | uniq | cut -d "=" -f2 >${CLIENT_SECRET}
 	env | grep 'REFESH_TOKEN' |sort | uniq | cut -d "=" -f2 >${REFESH_TOKEN}
 
-	paste "${CLIENT_NAME}" "${CLIENT_ID}"  "${CLIENT_SECRET}" "${REFESH_TOKEN}" | grep -v '^$'
+	paste "${CLIENT_NAME}" "${CLIENT_ID}" "${CLIENT_SECRET}" \
+		"${REFESH_TOKEN}" | grep -v '^$'
 
 	rm -f ${CLIENT_NAME}
 	rm -f ${CLIENT_ID}
@@ -56,45 +57,20 @@ function env_var() {
 	echo -n "{\"Key\":\"TC_SECRET_KEY\", \"Value\":\"${TC_SECRET_KEY}\"},"
 }
 
-function hmac256_py() {
-
-	cat >> $1 <<EOF
-# -*- coding: utf-8 -*-
-import sys
-import hashlib
-import hmac
-
-secret_key = sys.argv[1]
-service = sys.argv[2]
-date = sys.argv[3]
-string_to_sign = sys.argv[4]
-
-def sign(key, msg):
-    return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
-
-secret_date = sign(("TC3" + secret_key).encode("utf-8"), date)
-secret_service = sign(secret_date, service)
-secret_signing = sign(secret_service, "tc3_request")
-signature = hmac.new(secret_signing, string_to_sign.encode(
-    "utf-8"), hashlib.sha256).hexdigest()
-
-print(signature)
-
-EOF
-
-}
-
 function auth_sign() {
+	local HEADER=$1
+	local BODY=$2
+
 	local SECRETID=${TC_SECRET_ID}
 	local SECRETKEY=${TC_SECRET_KEY}
 	local ALGORITHM='TC3-HMAC-SHA256'
-	local HMAC256="$(mktemp)"
 	local ENTER=$'\n'
-	local TIME=$1
-	local DATE=$(date -d @${TIME} +%F)
+	local TIME=$(echo -e "${HEADER}" | grep 'X-TC-Timestamp:' | awk '{print $2}')
+	local DATE=$(date -u -d @${TIME} +%F)
+	local TYPE=$(echo -e "${HEADER}" | grep 'Content-Type:' | sed s/\ //g)
+	local HOST=$(echo -e "${HEADER}" | grep 'Host:' | awk '{print $2}')
 
-	# ************* 步骤 1：拼接规范请求串 *************
-
+	# ***************** 步骤 1：拼接规范请求串 *************
 	local HTTP_REQUEST='POST'
 	local URI='/'
 	local QUERY=""
@@ -106,159 +82,223 @@ function auth_sign() {
 ${ENTER}${HEADERS}${ENTER}${SIGED_HEADERS}${ENTER}${HASED_REQUEST_PLAYLOAD}"
 	local HASHED_REQUEST=$(echo -e -n "${REQUEST}" | sha256sum | awk '{print $1}')
 
-	# ************* 步骤 2：拼接待签名字符串 *************
+	# ***************** 步骤 2：拼接待签名字符串 *************
 	local SERVICE=$(echo ${HOST} | cut -d "." -f1)
-	local STRINGTOSIGN="${ALGORITHM}${ENTER}${TIME}${ENTER}${DATE}/${SERVICE}/tc3_request\
-${ENTER}${HASHED_REQUEST}"
+	local STRINGTOSIGN=$(echo -e "${ALGORITHM}${ENTER}${TIME}${ENTER}${DATE}\
+/${SERVICE}/tc3_request${ENTER}${HASHED_REQUEST}")
 
-	# ************* 步骤 3：计算签名 *************
-	hmac256_py ${HMAC256}
-	local SIGNATURE=$(python ${HMAC256} "${SECRETKEY}" "${SERVICE}" \
-		"${DATE}" "${STRINGTOSIGN}")
-	rm -f ${HMAC256}
+	# ***************** 步骤 3：计算签名 ********************
+	local SECRET_DATE=$(echo -n "${DATE}" \
+		| openssl dgst -hmac "TC3${SECRETKEY}" -sha256 -binary)
+	local SECRET_SERVICE=$(echo -n "${SERVICE}" \
+		| openssl dgst -hmac "${SECRET_DATE}" -sha256 -binary)
+	local SECRET_SIGNING=$(echo -n "tc3_request" \
+		| openssl dgst -hmac "${SECRET_SERVICE}" -sha256 -binary)
+	local SIGNATURE=$(echo -n "${STRINGTOSIGN}" \
+		| openssl dgst -hmac "${SECRET_SIGNING}" -sha256 -hex | cut -d " " -f2)
 
 	#  ************* 步骤 4：拼接 Authorization *************
-	echo -e ${ALGORITHM} 'Credential='${SECRETID}/${DATE}/${SERVICE}/tc3_request,\
-	 'SignedHeaders='${SIGED_HEADERS}, Signature=${SIGNATURE}
+	echo -e Authorization: ${ALGORITHM} 'Credential='${SECRETID}/${DATE}/${SERVICE}\
+/tc3_request, 'SignedHeaders='${SIGED_HEADERS}, Signature=${SIGNATURE}
 }
 
-function post_result_func_trigger() {
-	ACTION=$1
-	TRIGGER_NAME=$2
-	TRIGGER_DESC=$3
-	TIME=$(timestamp 1)
-	REGION=${TENCENTCLOUD_REGION}
-	VER='2018-04-16'
-	TYPE="Content-Type:application/json"
-	HOST='scf.tencentcloudapi.com'
-	BODY="{\"FunctionName\": \"${SCF_FUNCTIONNAME}\", \
-	\"TriggerName\": \"${TRIGGER_NAME}\", \
-	\"Type\": \"timer\", \
-	\"TriggerDesc\": \"${TRIGGER_DESC}\"}"
+function header() {
+	local HOST=$1
+	local VERSION=$2
+	local REGION=$3
+	local ACTION=$4
+	local HEADER=$5
+	local TIME=$(timestamp 1)
+	
+	cat > ${HEADER} <<EOF
+Host: ${HOST}
+X-TC-Action: ${ACTION}
+X-TC-Timestamp: ${TIME}
+X-TC-Version: ${VERSION}
+X-TC-Region: ${REGION}
+X-TC-Language: zh-CN
+Content-Type: application/json
+EOF
 
-	curl -s \
-	-H "Host: ${HOST}" \
-	-H "X-TC-Action: ${ACTION}" \
-	-H "X-TC-Timestamp: ${TIME}" \
-	-H "X-TC-Version: ${VER}" \
-	-H "X-TC-Region: ${REGION}" \
-	-H "X-TC-Language: zh-CN" \
-	-H "${TYPE}" \
-	-H "Authorization: $(auth_sign ${TIME})" \
-	-d "${BODY}" "https://${HOST}/"
 }
 
+function pack_code() {
+	local ZIP_FILE=/tmp/$1.zip	
+	# 打包代码
+	sed -i s/^PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
+	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*" >/dev/null
+	echo -e "${ZIP_FILE}"
+}
 
-function post_result_func() {
-	ACTION=$1
-	FUNC_NAME=$2
-	ZIPFILE=$3
-	HANDLER='index.main_handler'
-	REGION='ap-shanghai'
-	RUNTIME='CustomRuntime'
-	CODE='ZipFile'
-	MEM=64
-	TIMEOUT=60
-
-	TIME=$(timestamp 1)
-	VER='2018-04-16'
-	TYPE='Content-Type:application/json'
-	HOST='scf.tencentcloudapi.com'
-
-	BODY_JSON=/tmp/body.json
+function body() {
+	local ACTION=$1
+	local FUNC_NAME=$2
+	local BODY_JSON=$3
 
 	if [[ ${ACTION} == 'CreateFunction' ]]; then
+		# 函数基本配置
+		local RUNTIME='CustomRuntime'
+		local MEM=64
+		local TIMEOUT=60
+		# 代码基本配置
+		local HANDLER='index.main_handler'
+		local CODE='ZipFile'
+		# 打包代码
+		local ZIP_FILE=$(pack_code ${FUNC_NAME})
+		local ZIPFILE_BASE64=$(cat ${ZIP_FILE} | base64 -w 0)
+		echo -e "为函数${FUNC_NAME}打包代码为完成"
+
 		echo -e "{\"FunctionName\": \"${FUNC_NAME}\", \
 		\"Runtime\": \"${RUNTIME}\", \
 		\"MemorySize\": ${MEM}, \
 		\"Handler\": \"${HANDLER}\", \
 		\"Timeout\": ${TIMEOUT}, \
-		\"Code\": {\"${CODE}\": \"${ZIPFILE}\"}, \
+		\"Code\": {\"${CODE}\": \"${ZIPFILE_BASE64}\"}, \
 		\"Environment\": {\"Variables\": [$(env_var | sed s/.$//g)]}}" \
 		>${BODY_JSON}
 
 	elif [[ ${ACTION} == 'UpdateFunctionCode' ]]; then
+		# 代码基本配置
+		local HANDLER='index.main_handler'
+		local CODE='ZipFile'
+		# 打包代码
+		local ZIP_FILE=$(pack_code ${FUNC_NAME})
+		local ZIPFILE_BASE64=$(cat ${ZIP_FILE} | base64 -w 0)
+		echo -e "为函数${FUNC_NAME}打包代码为完成"
+
 		echo -e "{\"FunctionName\": \"${FUNC_NAME}\", \
 		\"Handler\": \"${HANDLER}\", \
-		\"Code\": {\"${CODE}\": \"${ZIPFILE}\"}}" \
+		\"Code\": {\"${CODE}\": \""${ZIPFILE_BASE64}"\"}}" \
 		>${BODY_JSON}
 
-	elif [[ ${ACTION} == 'DeleteFunction' ]]; then
+	elif [[ ${ACTION} == 'DeleteFunction' || ${ACTION} == 'Invoke' \
+		|| ${ACTION} == 'GetFunction' ]]; then
 		echo -e "{\"FunctionName\": \"${FUNC_NAME}\"}" \
 		>${BODY_JSON}
 
-	elif [[ ${ACTION} == 'Invoke' ]]; then
-		echo -e "{\"FunctionName\": \"${FUNC_NAME}\"}" \
-		>${BODY_JSON}
-	elif [[ ${ACTION} == 'GetFunction' ]]; then
-		echo -e "{\"FunctionName\": \"${FUNC_NAME}\"}" \
-		>${BODY_JSON}
 	elif [[ ${ACTION} == 'UpdateFunctionConfiguration' ]]; then
 		echo -e "{\"FunctionName\": \"${FUNC_NAME}\", \
 		\"Environment\": {\"Variables\": [$(env_var | sed s/.$//g)]}}" \
 		>${BODY_JSON}
+
+	elif [[ "${ACTION}" == 'CreateTrigger' || "${ACTION}" == 'DeleteTrigger' ]]; then
+		local TRIGGER_NAME=$4
+		local TRIGGER_DESC=$5
+
+		echo -e "{\"FunctionName\": \"${FUNC_NAME}\", \
+		\"TriggerName\": \"${TRIGGER_NAME}\", \
+		\"Type\": \"timer\", \
+		\"TriggerDesc\": \"${TRIGGER_DESC}\"}" \
+		>${BODY_JSON}
 	else
 		echo "参数错误！"
-		echo -e "此脚本仅支持: \\n\
+		echo -e "仅支持: \\n\
 		CreateFunction	创建函数\\n\
 		UpdateFunctionCode	更新函数代码\\n\
+		UpdateFunctionConfiguration	更新函数配置\\n\
+		CreateTrigger	创建触发器\\n\
+		DeleteTrigger	删除触发器\\n\
 		DeleteFunction	删除函数\\n\
 		Invoke	运行函数\\n"
 	fi
-
-	BODY=$(cat ${BODY_JSON})
-
-	curl -s \
-	-H "Host: ${HOST}" \
-	-H "X-TC-Action: ${ACTION}" \
-	-H "X-TC-Timestamp: ${TIME}" \
-	-H "X-TC-Version: ${VER}" \
-	-H "X-TC-Region: ${REGION}" \
-	-H "X-TC-Language: zh-CN" \
-	-H "${TYPE}" \
-	-H "Authorization: $(auth_sign ${TIME})" \
-	-d @${BODY_JSON} \
-	"https://${HOST}/"
-
-	rm -f ${BODY_JSON}
 }
 
-ZIP_FILE=/tmp/$2.zip
+function post_result_func() {
+	local ACTION=$1
+	local BODY_JSON=$2
 
-if [[ -z $1 || -z $2 ]]; then
+	# 定义函数
+	local HOST='scf.tencentcloudapi.com'
+	local VERSION='2018-04-16'
+	local REGION='ap-shanghai'
+
+	# 获取BODY内容
+	local BODY=$(cat ${BODY_JSON})
+
+	# 定义header
+	local HEADER=/tmp/header.txt
+	header "${HOST}" "${VERSION}" "${REGION}" "${ACTION}" "${HEADER}"
+
+	# 根据HEADER和BODY签名
+	local SIGNATURE=$(auth_sign "$(cat ${HEADER})" "${BODY}")
+
+	# 将签名封装入header
+	echo -e "${SIGNATURE}" >> ${HEADER}
+
+	# POST
+	curl -s -H @${HEADER} -d @${BODY_JSON} "https://${HOST}/"
+}
+
+ACTION=$1
+FUNC_NAME=$2
+BODY_JSON='/tmp/body.json'
+ZIP_FILE=/tmp/"${FUNC_NAME}".zip
+
+if [[ -z "${ACTION}" || -z "${FUNC_NAME}" ]]; then
 	echo "缺少函数名或触发方式"
 	exit 0
 fi
 
-if [[ $1 == 'CreateFunction' ]]; then
-	# 打包代码
-	echo '打包云函数'
-	sed -i s/^PLATFORM\=./PLATFORM\=2/g graph_api_app.sh
-	zip -r ${ZIP_FILE} ./ -x ".git/*" -x ".github/*"
-
+if [[ "${ACTION}" == 'CreateFunction' ]]; then
 	# 查询函数是否存在
-	RESPONSE=$(post_result_func GetFunction "${FUNC_NAME}")
+	body 'GetFunction' "${FUNC_NAME}" "${BODY_JSON}"
+	RESPONSE=$(post_result_func GetFunction "${BODY_JSON}")
 	# 函数不存在，则创建
-	if [[ $(echo -e ${RESPONSE} | jq -r '.Response.Error') == 'null' ]]; then
-		post_result_func CreateFunction $2 $(cat  ${ZIP_FILE} | base64 -w 0)
+	if [[ $(echo -e "${RESPONSE}" | jq -r '.Response.Error') != 'null' ]]; then
+		body 'CreateFunction' "${FUNC_NAME}" "${BODY_JSON}"
+		post_result_func 'CreateFunction' "${BODY_JSON}"
 	# 函数存在，则更新
 	else
 		echo '更新环境变量'
-		post_result_func UpdateFunctionConfiguration $2
-		echo -e "\\n更新代码"
-		post_result_func UpdateFunctionCode $2 $(cat  ${ZIP_FILE} | base64 -w 0) 
-	fi
-	echo -e "\\n等待5秒钟待函数发布完成"
-	sleep 5
-	echo '开始测试运行函数, 并更新定时触发器'
-	post_result_func Invoke "${FUNC_NAME}"
+		body UpdateFunctionConfiguration "${FUNC_NAME}" "${BODY_JSON}"
+		post_result_func UpdateFunctionConfiguration "${BODY_JSON}"
 
-	# 清理临时文件
-	rm -rf  ${ZIP_FILE}
-elif [[ $1 == 'CreateTrigger' || $1 == 'DeleteTrigger' ]]; then
-	post_result_func_trigger "$1" "$2" "$3"
+		echo -e "\\n更新代码"
+		body UpdateFunctionCode "${FUNC_NAME}" "${BODY_JSON}"
+		post_result_func UpdateFunctionCode "${BODY_JSON}"
+	fi
+	echo -e "\\n等待函数发布成功"
+	i=0
+	while :
+	do
+		if [[ $[i] -ge 10 ]]; then
+			echo -e "函数 ${FUNC_NAME} 发布超时$(($[i] + 1))秒"
+			echo -e "结束任务"
+			# 清理临时文件
+			rm -f  ${ZIP_FILE}
+			rm -f ${HEADER}
+			rm -f ${BODY_JSON}
+			exit 0
+		fi
+		body 'GetFunction' "${FUNC_NAME}" "${BODY_JSON}"
+		RESPONSE=$(post_result_func GetFunction "${BODY_JSON}" \
+			| jq -r '.Response.Status')
+		if [[ "${RESPONSE}" == 'Active' ]]; then
+			echo -e "函数 ${FUNC_NAME} 发布成功"
+			break
+		fi
+		sleep 1
+		let i++
+	done
+	echo '开始测试运行函数'
+	body Invoke "${FUNC_NAME}" "${BODY_JSON}"
+	post_result_func Invoke "${BODY_JSON}"
+	
+elif [[ "${ACTION}" == 'CreateTrigger' || "${ACTION}" == 'DeleteTrigger' ]]; then
+	TRIGGER_NAME=$3
+	TRIGGER_DESC=$4
+	body "${ACTION}" "${FUNC_NAME}" "${BODY_JSON}" "${TRIGGER_NAME}" "${TRIGGER_DESC}"
+	post_result_func "${ACTION}" "${BODY_JSON}"
 else
-	post_result_func $1 $2
+	# 按照触发条件生成BODY
+	body "${ACTION}" "${FUNC_NAME}" "${BODY_JSON}"
+	# 签名并执行函数
+	post_result_func "${ACTION}" "${BODY_JSON}"
 fi
+
+echo -e "\\n清理临时文件"
+rm -f ${ZIP_FILE}
+rm -f ${HEADER}
+rm -f ${BODY_JSON}
 
 exit 0
