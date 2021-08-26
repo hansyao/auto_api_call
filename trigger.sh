@@ -225,8 +225,18 @@ function post_result_func() {
 	# 将签名封装入header
 	echo -e "${SIGNATURE}" >> ${HEADER}
 
+	# 生成header数组，兼容老版本curl
+	local ARGS[0]='-k'
+	local i=1
+	while read LINE && [[ -n "${LINE}" ]]
+	do
+		local ARGS[$[i]]='-H'
+		local ARGS[$(($[i] + 1))]="${LINE}"
+		i=$(($[i] + 2))
+	done <${HEADER}
+
 	# POST
-	curl -s -H @${HEADER} -d @${BODY_JSON} "https://${HOST}/"
+	curl -s -H "${ARGS[@]}" -d @${BODY_JSON} "https://${HOST}/"
 }
 
 ACTION=$1
