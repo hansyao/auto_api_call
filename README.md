@@ -16,7 +16,7 @@
 * 申请一个Personal access token，授予repo和workflow权限
 ![Github Secret ID](https://cdn.jsdelivr.net/gh/hansyao/image-hosting@master/20210606/Screenshot%20from%202021-08-23%2010-06-05.5haf6e1xk4g0.png)
 
-* 在本项目settings->Actions secrets新建New secrets命名为**GH_SECRET**，将上面申请到的Personal access token粘贴进去。
+* 在本项目settings->Actions secrets新建New secrets命名为**GH_TOKEN**，将上面申请到的Personal access token粘贴进去。
 
 2. **腾讯云函数**(如需要部署)： 
 
