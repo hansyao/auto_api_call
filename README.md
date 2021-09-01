@@ -47,8 +47,9 @@ FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY�
 
 如需部署到腾讯云函数，可以运行action [发布腾讯云函数](../../actions/workflows/tencent_cloud.yml), 如果准备工作3中的密钥填得正确的话，本项目会自动部署到你的腾讯云函数账户里并设定为随机触发。
 
-如需部署到VPS， 将环境变量填到[函数account_env](../../blob/master/graph_api_app.sh#L8-L21)里然后复制``graph_api_app.sh``到你的VPS里，运行一次即可。
+如需部署到VPS， 更改[graph_api_app.sh第6行PLATFORM参数为3](../../blob/fa42ebca954104c3fb8941d7e7c2f7ffe6cd0933/graph_api_app.sh#L6)同时将环境变量填到[函数account_env](../../blob/master/graph_api_app.sh#L8-L21)里然后复制``graph_api_app.sh``到你的VPS里，运行一次即可。
 
-
+**备注**：运行Actions后，请检查调用API部分的日志(见如下截屏)，确保API调用成功。
+![](https://cdn.jsdelivr.net/gh/hansyao/image-hosting@master/20210606/e5_actions.1cdg7rdlm31c.png)
 <br>
 至此，全部部署完成。
