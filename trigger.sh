@@ -57,12 +57,36 @@ function env_var() {
 	echo -n "{\"Key\":\"TC_SECRET_KEY\", \"Value\":\"${TC_SECRET_KEY}\"},"
 }
 
+function hmac256_py() {
+
+	cat >> $1 <<EOF
+# -*- coding: utf-8 -*-
+import sys
+import hashlib
+import hmac
+secret_key = sys.argv[1]
+service = sys.argv[2]
+date = sys.argv[3]
+string_to_sign = sys.argv[4]
+def sign(key, msg):
+    return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+secret_date = sign(("TC3" + secret_key).encode("utf-8"), date)
+secret_service = sign(secret_date, service)
+secret_signing = sign(secret_service, "tc3_request")
+signature = hmac.new(secret_signing, string_to_sign.encode(
+    "utf-8"), hashlib.sha256).hexdigest()
+print(signature)
+EOF
+
+}
+
 function auth_sign() {
 	local HEADER=$1
 	local BODY=$2
 
 	local SECRETID=${TC_SECRET_ID}
 	local SECRETKEY=${TC_SECRET_KEY}
+	local HMAC256="$(mktemp)"
 	local ALGORITHM='TC3-HMAC-SHA256'
 	local ENTER=$'\n'
 	local TIME=$(echo -e "${HEADER}" | grep 'X-TC-Timestamp:' | awk '{print $2}')
@@ -87,16 +111,12 @@ ${ENTER}${HEADERS}${ENTER}${SIGED_HEADERS}${ENTER}${HASED_REQUEST_PLAYLOAD}"
 	local STRINGTOSIGN=$(echo -e "${ALGORITHM}${ENTER}${TIME}${ENTER}${DATE}\
 /${SERVICE}/tc3_request${ENTER}${HASHED_REQUEST}")
 
-	# ***************** 步骤 3：计算签名 ********************
-	local SECRET_DATE=$(echo -n "${DATE}" \
-		| openssl dgst -hmac "TC3${SECRETKEY}" -sha256 -binary)
-	local SECRET_SERVICE=$(echo -n "${SERVICE}" \
-		| openssl dgst -hmac "${SECRET_DATE}" -sha256 -binary)
-	local SECRET_SIGNING=$(echo -n "tc3_request" \
-		| openssl dgst -hmac "${SECRET_SERVICE}" -sha256 -binary)
-	local SIGNATURE=$(echo -n "${STRINGTOSIGN}" \
-		| openssl dgst -hmac "${SECRET_SIGNING}" -sha256 -hex | cut -d " " -f2)
-
+	# ************* 步骤 3：计算签名 *************
+	hmac256_py ${HMAC256}
+	local SIGNATURE=$(python ${HMAC256} "${SECRETKEY}" "${SERVICE}" \
+		"${DATE}" "${STRINGTOSIGN}")
+	rm -f ${HMAC256}
+	
 	#  ************* 步骤 4：拼接 Authorization *************
 	echo -e Authorization: ${ALGORITHM} 'Credential='${SECRETID}/${DATE}/${SERVICE}\
 /tc3_request, 'SignedHeaders='${SIGED_HEADERS}, Signature=${SIGNATURE}
