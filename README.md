@@ -26,12 +26,11 @@
 
 * 新建Web应用，将重定向地址指向http://localhost:53682/
 * 申请证书和密码授予相关API权限
-* 将申请到的CLIENT ID和SECRET命名为CLIENT_ID1和CLIENT_SECRET1添加到本项目settings->Actions secrets， 
+* 将申请到的CLIENT ID和SECRET命名为CLIENT_ID1和CLIENT_SECRET1添加到本项目settings->Actions secrets
 * 根据申请到的CLIENT ID和SECRET用rclone得到refresh_token, 命名为REFESH_TOKEN1添加到本项目settings->Actions secrets。
+	>如是Linux系统，可运行本项目的小工具```init_token.sh```按提示填入**CLIENT_ID**和**CLIENT_SECRET**即可很方便地得到REFRESH_TOKEN。
 * 将CLIENT_ID， CLIENT_SECRET， REFESH_TOKEN同时填入[auto_ms_api.yml](../../blob/master/.github/workflows/auto_ms_api.yml#L19-L27)
 	>如有多个可按照CLIENT_ID2， CLIENT_SECRET2和REFESH_TOKEN2添加。(保持前缀CLIENT_ID， CLIENT_SECRET， REFESH_TOKEN一致并成对出现即可，本项目会自动抓取所有符合规则的环境变量运行)
-
-	>如是Linux系统，可运行本项目的小工具```init_token.sh```按提示填入**CLIENT_ID**和**CLIENT_SECRET**即可很方便地得到REFRESH_TOKEN。
 
 最终，我们可以在在本项目settings->Actions secrets中得到如下token。
 
