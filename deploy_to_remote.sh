@@ -62,8 +62,7 @@ function remote_exec() {
 
 	echo -e "远程发送执行命令到服务器"
 	${SSH_PWD_CMD} ssh -o "StrictHostKeyChecking no" ${SSH_KEY_CMD} \
-		${USER_NAME}@${HOST_IP} -p ${SERVER_PORT} "${REMOTE_CMD}" \
-		> /dev/null
+		${USER_NAME}@${HOST_IP} -p ${SERVER_PORT} "${REMOTE_CMD}"
 	if [[ $? -eq 0 ]]; then
 		echo -e "远程命令执行成功"
 	else
