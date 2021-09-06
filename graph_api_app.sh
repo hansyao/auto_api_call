@@ -217,7 +217,7 @@ function update_cron() {
 		./trigger.sh 'CreateTrigger' "${SCF_FUNCTIONNAME}" 'graph_api' "${CRON}"
 	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
-		crontab -l | { cat; echo -n "${M} ${H} * * * * source ${HOME}/.bashrc && cd graph_api && ./graph_api_app.sh"; } | crontab -
+		crontab -l | { cat; echo -e "${M} ${H} * * * source ${HOME}/.bashrc && cd graph_api && `pwd`/$(basename $0)"; } | crontab -
 	else
 		echo -e "platform 参数不正确!"
 		return 1
@@ -270,7 +270,7 @@ function main() {
 	update_cron $H $M $[PLATFORM]
 	if [[ $? -eq 1 ]]; then
 		echo -e "计划任务设置失败......"
-		exit
+		exit 1
 	fi
 	echo -e "\\n下一轮调用时间 $(date -d @$[UPCOMMING_SCHEDULED]) 已计划"
 }
