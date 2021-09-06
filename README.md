@@ -44,11 +44,23 @@
 FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
 ```
 
-如需部署到腾讯云函数，可以运行action [发布腾讯云函数](../../actions/workflows/tencent_cloud.yml), 如果准备工作3中的密钥填得正确的话，本项目会自动部署到你的腾讯云函数账户里并设定为随机触发。
+如需部署到腾讯云函数，可以运行action [部署到腾讯云函数](../../actions/workflows/tencent_cloud.yml), 如果准备工作3中的密钥填得正确的话，本项目会自动部署到你的腾讯云函数账户里并设定为随机触发。
 
-如需部署到VPS， 更改[graph_api_app.sh第6行PLATFORM参数为3](../../blob/fa42ebca954104c3fb8941d7e7c2f7ffe6cd0933/graph_api_app.sh#L6)同时将环境变量填到[函数account_env](../../blob/master/graph_api_app.sh#L8-L21)里然后复制``graph_api_app.sh``到你的VPS里，运行一次即可。
+如需部署到VPS: 
+1. 在本项目settings->Actions secrets新建以下New secrets将VPS的SSH登录信息填入：
+```bash
+	REMOTE_IP		#目标VPS的IP地址或者指向的域名
+	REMOTE_PORT		#ssh端口
+	REMOTE_SSH_KEY		#ssh密钥 (密钥与密码二选一即可)
+	REMOTE_PASSWORD		#ssh登录密码 (密钥与密码二选一即可)
+	REMOTE_USER_NAME	#ssh登录用户名
+```
+2. 然后运行action [部署到远程服务器](../../actions/workflows/deploy_to_remote.yml), 本项目即可自动部署到你的VPS服务器里并设定为随机触发， 任务触发后最后一次的日志默认保存在服务器路径```$HOME/graph_api/graph_api.log```。
+
+<br>
 
 **备注**：运行Actions后，请检查调用API部分的日志(见如下截屏)，确保API调用成功。
 ![](https://cdn.jsdelivr.net/gh/hansyao/image-hosting@master/20210606/e5_actions.1cdg7rdlm31c.png)
+
 <br>
 至此，全部部署完成。
