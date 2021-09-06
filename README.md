@@ -47,7 +47,7 @@ FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY�
 如需部署到腾讯云函数，可以运行action [部署到腾讯云函数](../../actions/workflows/tencent_cloud.yml), 如果准备工作3中的密钥填得正确的话，本项目会自动部署到你的腾讯云函数账户里并设定为随机触发。
 
 如需部署到VPS: 
-1. 在本项目settings->Actions secrets新建以下New secrets将VPS的SSH登录信息填入：
+1. 在本项目settings->Actions secrets新建追加以下New secrets将VPS的SSH登录信息填入：
 ```bash
 	REMOTE_IP		#目标VPS的IP地址或者指向的域名
 	REMOTE_PORT		#ssh端口
