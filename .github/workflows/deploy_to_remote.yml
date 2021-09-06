@@ -1,4 +1,4 @@
-name: 发布到远程服务器
+name: 部署到远程服务器
 on: 
   workflow_dispatch:
 
