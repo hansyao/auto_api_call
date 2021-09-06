@@ -1,0 +1,30 @@
+name: 发布到远程服务器
+on: 
+  workflow_dispatch:
+
+jobs: 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 迁出代码
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+    - name: 设置时区
+      run: |
+        sudo timedatectl set-timezone 'UTC'
+    - name: 发布到远程服务器
+      env:
+        CLIENT_ID1: ${{ secrets.CLIENT_ID1 }}
+        CLIENT_SECRET1: ${{ secrets.CLIENT_SECRET1 }}
+        REFESH_TOKEN1: ${{ secrets.REFESH_TOKEN1 }}
+        CLIENT_ID2: ${{ secrets.CLIENT_ID2 }}
+        CLIENT_SECRET2: ${{ secrets.CLIENT_SECRET2 }}
+        REFESH_TOKEN2: ${{ secrets.REFESH_TOKEN2 }}
+        REMOTE_IP: ${{ secrets.REMOTE_IP }}
+        REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+        REMOTE_USER_NAME: ${{ secrets.REMOTE_USER_NAME }}
+        REMOTE_PASSWORD: ${{ secrets.REMOTE_PASSWORD }}
+        REMOTE_SSH_KEY: ${{ secrets.REMOTE_SSH_KEY }}
+      run: |
+        ./deploy_to_remote.sh

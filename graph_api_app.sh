@@ -232,7 +232,7 @@ function update_cron() {
 	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
 		crontab -l | { cat; echo -e \
-		"0 ${M} ${H} * * * *	`pwd`/$(basename $0)"; } | crontab -
+		"${M} ${H} * * * * source ${HOME}/.bashrc && cd graph_api && `pwd`/$(basename $0)"; } | crontab -
 	else
 		echo -e "platform 参数不正确!"
 		return 1
