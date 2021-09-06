@@ -5,20 +5,6 @@ THREADNUMBER=10	# 多线程的线程数：默认10,可根据实际性能表现�
 FREQUENCY=60 	# 频率（单位：分钟）： 取【当前时间+(0~FREQUENCY之间的随机数)+10】确定为下一次运行的时间
 PLATFORM=1	# 1. Github Actions; 2. 腾讯云函数; 3. VPS
 
-function account_env() {
-	export CLIENT_ID1=''
-	export CLIENT_SECRET1=''
-	export REFESH_TOKEN1=''
-
-	export CLIENT_ID2=''
-	export CLIENT_SECRET2=''
-	export REFESH_TOKEN2=''
-
-	export CLIENT_ID3=''
-	export CLIENT_SECRET3=''
-	export REFESH_TOKEN3=''
-}
-
 function api_list() {
 	echo -e '
 
@@ -240,9 +226,6 @@ function update_cron() {
 
 function main() {
 	RESULTS_FILE="$(mktemp)"
-	if [[ $[PLATFORM] -eq 3 ]]; then
-		account_env
-	fi
 	local CLIENT_LIST=$(get_client_info)
 	# echo -e "测试令牌"
 	# echo -e "${CLIENT_LIST}\\n"
