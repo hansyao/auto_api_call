@@ -217,7 +217,7 @@ function update_cron() {
 		./trigger.sh 'CreateTrigger' "${SCF_FUNCTIONNAME}" 'graph_api' "${CRON}"
 	# VPS自动任务
 	elif [[ $[PLATFORM] -eq 3 ]]; then
-		sed -i "/$(basename $0)/d" /var/spool/cron/crontabs/`whoami`
+		sed -i "/$(basename $0)/d" /var/spool/cron/$USER
 		crontab -l | { cat; echo -e "${M} ${H} * * * source ${HOME}/.bashrc && cd graph_api && `pwd`/$(basename $0) >graph_api.log 2>&1 &"; } | crontab -
 	else
 		echo -e "platform 参数不正确!"
